@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar.vue';
 import HeaderDashboard from '@/components/HeaderDashboard.vue';
 import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { push } from 'notivue';
+import { router as louter } from '@inertiajs/core';
 // Page
 const page = usePage();
 
@@ -105,9 +106,10 @@ const SubmitCart = () => {
     },
     onSuccess: () => {
       push.success({
-        message: 'Beres dan terdata!',
+        message: 'Pesanan berhasil ditambahkan, Anda akan dialihkan ke halaman riwayat untuk mencetak struk',
         duration: 1750,
       });
+      louter.visit('/kasir/riwayat')
     }
   });
 };
@@ -346,16 +348,16 @@ watch(checkoutForm, (value) => {
                 <div @click="selectPayment('cash')"
                   class="w-full py-3 rounded-full border-[1.5px] text-center font-semibold cursor-pointer transition"
                   :class="selectedMethod === 'cash'
-                      ? 'bg-white border-secondary text-secondary'
-                      : 'bg-white border-none'
+                    ? 'bg-white border-secondary text-secondary'
+                    : 'bg-white border-none'
                     ">
                   CASH
                 </div>
                 <div @click="selectPayment('qris')"
                   class="w-full py-3 rounded-full border-[1.5px] text-center font-semibold cursor-pointer transition"
                   :class="selectedMethod === 'qris'
-                      ? 'bg-white border-secondary text-secondary'
-                      : 'bg-white border-none'
+                    ? 'bg-white border-secondary text-secondary'
+                    : 'bg-white border-none'
                     ">
                   QRIS
                 </div>

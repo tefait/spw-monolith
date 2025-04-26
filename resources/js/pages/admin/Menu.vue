@@ -17,7 +17,7 @@ const newProduct = useForm({
   supplier_price: 0,
   price: 0,
   stock: 0,
-  category_id: 1, // change this to the correct category id later
+  category_id: 0, // change this to the correct category id later
   image: null,
   supplier_id: 'placeholder',
   status: 'placeholder',
@@ -38,7 +38,7 @@ const saveNewProduct = () => {
 const editProductForm = useForm({
   _method: 'PUT',
   name: null,
-  category_id: 1, // change this to the correct category id later
+  category_id: 0, // change this to the correct category id later
   supplier_price: null,
   price: null,
   stock: null,
@@ -144,6 +144,7 @@ const openModalUbah = () => {
   editProductForm.supplier_price = product.value?.supplier_price;
   editProductForm.status = product.value?.status;
   editProductForm.id = product.value?.id;
+  editProductForm.category_id = product.value?.category_id;
   showModalUbah.value = true;
 };
 const closeModalUbah = () => {
@@ -168,14 +169,9 @@ const closeModalHapus = () => {
       <div class="md:flex justify-between">
         <div class="">
           <div class="w-full md:w-96 relative">
-            <input
-              type="search"
-              class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-              placeholder="Cari menu"
-            />
-            <div
-              class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-            >
+            <input type="search" class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
+              placeholder="Cari menu" />
+            <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
               <p class="text-textDark text-xl">
                 <i class="fi fi-rr-search"></i>
               </p>
@@ -184,15 +180,12 @@ const closeModalHapus = () => {
         </div>
         <div class="flex gap-2 mt-4 md:mt-0">
           <button
-            class="bg-primaryThin py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:bg-primary duration-300"
-          >
+            class="bg-primaryThin py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:bg-primary duration-300">
             <p class="text-textDark"><i class="fi fi-rr-qr"></i></p>
             <p class="text-textDark font-medium">QR Code</p>
           </button>
-          <button
-            @click="openModalTambah"
-            class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300"
-          >
+          <button @click="openModalTambah"
+            class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300">
             <p class="text-textDark text-sm translate-y-0.5">
               <i class="fi fi-rr-plus"></i>
             </p>
@@ -208,25 +201,17 @@ const closeModalHapus = () => {
           Daftar Menu Hari Ini
         </h1>
         <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-4">
-          <div
-            v-for="item in $page.props.items"
-            :key="item.id"
-            @click="openModalDetail(item)"
-            type="button"
+          <div v-for="item in $page.props.items" :key="item.id" @click="openModalDetail(item)" type="button"
             class="col-span-1 p-4 mt-4 rounded-3xl flex gap-4 text-start cursor-pointer"
-            :class="item.status ? 'bg-primaryThin' : 'bg-white'"
-          >
-            <div
-              class="w-[calc(50%-56px)] h-[12vh] sm:w-[8vw] rounded-2xl overflow-hidden relative"
-            >
-              <img
-                :src="item.image"
-                class="absolute top-0 left-0 w-full h-full object-cover"
-                alt=""
-              />
+            :class="item.status ? 'bg-primaryThin' : 'bg-white'">
+            <div class="w-[calc(50%-56px)] h-[12vh] sm:w-[8vw] rounded-2xl overflow-hidden relative">
+              <img :src="item.image" class="absolute top-0 left-0 w-full h-full object-cover" alt="" />
             </div>
             <div class="my-auto">
-              <h1 class="line-clamp-1">{{ item.name }}</h1>
+              <h1 class="line-clamp-1 flex justify-between">
+                <div class="">{{ item.name }}</div>
+                <div class="ms-1 md:ms-2 text-xs bg-green-600/25 flex justify-center items-center text-center line-clamp-1 rounded-full px-2 py-1">{{ item.category.name }}</div>
+              </h1>
               <h2 class="font-bold">
                 Rp{{ Number(item.price).toLocaleString('id-ID') }}
               </h2>
@@ -244,36 +229,23 @@ const closeModalHapus = () => {
 
     <!-- Modal Detail Menu -->
     <Transition name="fade">
-      <div
-        v-if="showModalDetail"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
-        @click="closeModalDetail"
-      ></div>
+      <div v-if="showModalDetail" class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
+        @click="closeModalDetail"></div>
     </Transition>
 
     <Transition name="scale">
-      <div
-        v-if="showModalDetail"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[90%] md:w-[40%] py-8 px-6 rounded-4xl shadow-lg text-center z-30"
-      >
+      <div v-if="showModalDetail"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[90%] md:w-[40%] py-8 px-6 rounded-4xl shadow-lg text-center z-30">
         <div class="flex justify-between">
           <h1 class="text-textDark text-lg font-semibold">Detail Menu</h1>
-          <p
-            class="text-textDark text-2xl cursor-pointer"
-            @click="closeModalDetail"
-          >
+          <p class="text-textDark text-2xl cursor-pointer" @click="closeModalDetail">
             <i class="fi fi-rr-cross-small"></i>
           </p>
         </div>
         <div class="md:flex gap-4 mt-4">
           <div
-            class="relative w-36 h-36 md:w-[calc(50%-56px)] md:h-auto rounded-full md:rounded-3xl mx-auto overflow-hidden"
-          >
-            <img
-              :src="product?.image"
-              class="absolute top-0 left-0 w-full h-full object-cover"
-              alt=""
-            />
+            class="relative w-36 h-36 md:w-[calc(50%-56px)] md:h-auto rounded-full md:rounded-3xl mx-auto overflow-hidden">
+            <img :src="product?.image" class="absolute top-0 left-0 w-full h-full object-cover" alt="" />
           </div>
           <div class="w-[56%] text-start mt-4 md:mt-0">
             <h1 class="line-clamp-1">{{ product?.name }}</h1>
@@ -290,31 +262,23 @@ const closeModalHapus = () => {
             <div class="mt-2">
               <p class="text-textGrayDark text-xs">Status</p>
               <div class="flex items-center gap-3 mt-1">
-                <button
-                  @click="toggle"
-                  :class="[
-                    'w-[52px] h-7 rounded-full flex items-center transition-colors duration-300 p-1 cursor-pointer',
-                    product?.status ? 'bg-green' : 'bg-textGray',
-                  ]"
-                >
+                <button @click="toggle" :class="[
+                  'w-[52px] h-7 rounded-full flex items-center transition-colors duration-300 p-1 cursor-pointer',
+                  product?.status ? 'bg-green' : 'bg-textGray',
+                ]">
                   <div
                     class="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 text-sm"
-                    :class="product?.status ? 'translate-x-6' : 'translate-x-0'"
-                  >
-                    <i
-                      :class="[
-                        'text-xs transition-opacity duration-200',
-                        product?.status
-                          ? 'fi fi-rr-check text-green'
-                          : 'fi fi-rr-cross text-secondary',
-                      ]"
-                    ></i>
+                    :class="product?.status ? 'translate-x-6' : 'translate-x-0'">
+                    <i :class="[
+                      'text-xs transition-opacity duration-200',
+                      product?.status
+                        ? 'fi fi-rr-check text-green'
+                        : 'fi fi-rr-cross text-secondary',
+                    ]"></i>
                   </div>
                 </button>
 
-                <p
-                  :class="product?.status ? 'text-green' : 'text-textGrayDark'"
-                >
+                <p :class="product?.status ? 'text-green' : 'text-textGrayDark'">
                   {{ statusText }}
                 </p>
               </div>
@@ -322,10 +286,8 @@ const closeModalHapus = () => {
           </div>
         </div>
         <div class="flex justify-between mt-4 gap-2">
-          <button
-            @click="openModalUbah"
-            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300"
-          >
+          <button @click="openModalUbah"
+            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300">
             <div class="flex justify-center items-center gap-2">
               <p class="text-lg translate-y-0.5">
                 <i class="fi fi-rr-edit"></i>
@@ -333,10 +295,7 @@ const closeModalHapus = () => {
               <p>Ubah</p>
             </div>
           </button>
-          <button
-            @click="openModalHapus"
-            class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer"
-          >
+          <button @click="openModalHapus" class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer">
             <div class="flex justify-center items-center gap-2">
               <p class="text-lg translate-y-0.5">
                 <i class="fi fi-rr-trash"></i>
@@ -350,28 +309,16 @@ const closeModalHapus = () => {
 
     <!-- Overlay Gelap -->
     <Transition name="fade">
-      <div
-        v-if="showModalTambah"
-        class="fixed inset-0 bg-black/50 z-20"
-        @click="closeModalTambah"
-      ></div>
+      <div v-if="showModalTambah" class="fixed inset-0 bg-black/50 z-20" @click="closeModalTambah"></div>
     </Transition>
 
     <!-- Modal Tambah Menu -->
     <Transition name="scale">
-      <div
-        v-if="showModalTambah"
-        class="fixed inset-0 z-30 overflow-y-auto flex justify-center items-start"
-      >
-        <div
-          class="bg-bgGray w-[90%] md:w-[60%] p-4 md:py-8 md:px-6 rounded-4xl shadow-lg mt-10 mb-10"
-        >
+      <div v-if="showModalTambah" class="fixed inset-0 z-30 overflow-y-auto flex justify-center items-start">
+        <div class="bg-bgGray w-[90%] md:w-[60%] p-4 md:py-8 md:px-6 rounded-4xl shadow-lg mt-10 mb-10">
           <div class="flex justify-between">
             <h1 class="text-textDark text-lg font-semibold">Tambah Menu</h1>
-            <p
-              class="text-textDark text-2xl cursor-pointer"
-              @click="closeModalTambah"
-            >
+            <p class="text-textDark text-2xl cursor-pointer" @click="closeModalTambah">
               <i class="fi fi-rr-cross-small"></i>
             </p>
           </div>
@@ -383,21 +330,11 @@ const closeModalHapus = () => {
                 <p>Foto Menu</p>
               </label>
               <div class="relative mt-2">
-                <input
-                  type="file"
-                  id="uploadFotoMenu"
-                  class="hidden"
-                  @change="updateFileName($event, saveNewProduct)"
-                  ref="fileInput"
-                />
-                <label
-                  for="uploadFotoMenu"
-                  class="flex items-center gap-2 w-full bg-white rounded-full cursor-pointer shadow-sm"
-                >
-                  <span
-                    class="bg-bgGray py-3 px-4 rounded-l-full text-textDark text-sm w-[50%]"
-                    >Choose File</span
-                  >
+                <input type="file" id="uploadFotoMenu" class="hidden" @change="updateFileName($event, saveNewProduct)"
+                  ref="fileInput" />
+                <label for="uploadFotoMenu"
+                  class="flex items-center gap-2 w-full bg-white rounded-full cursor-pointer shadow-sm">
+                  <span class="bg-bgGray py-3 px-4 rounded-l-full text-textDark text-sm w-[50%]">Choose File</span>
                   <span class="text-textGrayDark pr-4 line-clamp-1 w-full">
                     {{ fileName || 'No file chosen' }}
                   </span>
@@ -409,17 +346,10 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="nama-menu" class="text-textDark">Nama Menu</label>
               <div class="relative mt-2">
-                <input
-                  type="text"
-                  id="nama-menu"
-                  v-model="newProduct.name"
+                <input type="text" id="nama-menu" v-model="newProduct.name"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                  placeholder="Masukkan Nama Menu"
-                  required
-                />
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-                >
+                  placeholder="Masukkan Nama Menu" required />
+                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                   <p class="text-textDark text-xl">
                     <i class="fi fi-rr-hamburger-soda"></i>
                   </p>
@@ -429,21 +359,12 @@ const closeModalHapus = () => {
 
             <!-- Harga Supplier -->
             <div class="col-span-1">
-              <label for="harga-supplier" class="text-textDark"
-                >Harga Supplier</label
-              >
+              <label for="harga-supplier" class="text-textDark">Harga Supplier</label>
               <div class="relative mt-2">
-                <input
-                  type="number"
-                  id="harga-supplier"
-                  v-model="newProduct.supplier_price"
+                <input type="number" id="harga-supplier" v-model="newProduct.supplier_price"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                  placeholder="Masukkan Harga Supplier"
-                  required
-                />
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-                >
+                  placeholder="Masukkan Harga Supplier" required />
+                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                   <p class="text-textDark text-xl">
                     <i class="fi fi-rr-user-salary"></i>
                   </p>
@@ -455,17 +376,10 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="harga-jual" class="text-textDark">Harga Jual</label>
               <div class="relative mt-2">
-                <input
-                  type="number"
-                  id="harga-jual"
-                  v-model="newProduct.price"
+                <input type="number" id="harga-jual" v-model="newProduct.price"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                  placeholder="Masukkan Harga Jual"
-                  required
-                />
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-                >
+                  placeholder="Masukkan Harga Jual" required />
+                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                   <p class="text-textDark text-xl">
                     <i class="fi fi-rr-usd-circle"></i>
                   </p>
@@ -477,17 +391,10 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="stok" class="text-textDark">Stok</label>
               <div class="relative mt-2">
-                <input
-                  type="number"
-                  id="stok"
-                  v-model="newProduct.stock"
+                <input type="number" id="stok" v-model="newProduct.stock"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                  placeholder="Masukkan Stok"
-                  required
-                />
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-                >
+                  placeholder="Masukkan Stok" required />
+                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                   <p class="text-textDark text-xl">
                     <i class="fi fi-rr-box-open-full"></i>
                   </p>
@@ -499,12 +406,9 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="supplier" class="text-textDark">Supplier</label>
               <div class="relative mt-2">
-                <select
-                  id="supplier"
-                  v-model="newProduct.supplier_id"
+                <select id="supplier" v-model="newProduct.supplier_id"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none appearance-none cursor-pointer"
-                  required
-                >
+                  required>
                   <option value="placeholder" disabled selected>
                     Pilih Supplier
                   </option>
@@ -512,9 +416,7 @@ const closeModalHapus = () => {
                     {{ s.name }}
                   </option>
                 </select>
-                <div
-                  class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4"
-                >
+                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4">
                   <i class="fi fi-rr-supplier text-textDark text-xl"></i>
                 </div>
               </div>
@@ -524,33 +426,40 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="status" class="text-textDark">Status</label>
               <div class="relative mt-2">
-                <select
-                  id="status"
-                  v-model="newProduct.status"
+                <select id="status" v-model="newProduct.status"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none appearance-none cursor-pointer"
-                  required
-                >
+                  required>
                   <option value="placeholder" disabled selected>
                     Pilih Status
                   </option>
                   <option value="1">Aktif</option>
                   <option value="0">Nonaktif</option>
                 </select>
-                <div
-                  class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4"
-                >
+                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4">
                   <i class="fi fi-rr-power text-textDark text-xl"></i>
                 </div>
               </div>
             </div>
 
+            <!-- Category -->
+            <div class="col-span-1">
+              <label for="status" class="text-textDark">Category</label>
+              <div class="relative mt-2">
+                <select id="status" v-model="newProduct.category_id"
+                  class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none appearance-none cursor-pointer"
+                  required>
+                  <option v-for="category in $page.props.categories" :value="category.id" selected>{{ category.name }}
+                  </option>
+                </select>
+                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4">
+                  <i class="fi fi-rr-power text-textDark text-xl"></i>
+                </div>
+              </div>
+            </div>
             <!-- Tombol Simpan -->
             <div class="md:col-span-2 flex justify-end">
-              <button
-                type="submit"
-                @click="saveNewProduct"
-                class="bg-primary px-12 py-3 rounded-full cursor-pointer translate-x-1.5 hover:brightness-90 duration-300"
-              >
+              <button type="submit" @click="saveNewProduct"
+                class="bg-primary px-12 py-3 rounded-full cursor-pointer translate-x-1.5 hover:brightness-90 duration-300">
                 <div class="flex justify-center items-center gap-2">
                   <p class="text-textDark text-lg translate-y-0.5">
                     <i class="fi fi-rr-disk"></i>
@@ -566,28 +475,16 @@ const closeModalHapus = () => {
 
     <!-- Overlay Gelap -->
     <Transition name="fade">
-      <div
-        v-if="showModalTambah"
-        class="fixed inset-0 bg-black/50 z-20"
-        @click="closeModalTambah"
-      ></div>
+      <div v-if="showModalTambah" class="fixed inset-0 bg-black/50 z-20" @click="closeModalTambah"></div>
     </Transition>
 
     <!-- Modal Ubah Menu -->
     <Transition name="scale">
-      <div
-        v-if="showModalUbah"
-        class="fixed inset-0 z-30 overflow-y-auto flex justify-center items-start"
-      >
-        <div
-          class="bg-bgGray w-[90%] md:w-[60%] p-4 md:py-8 md:px-6 rounded-4xl shadow-lg mt-10 mb-10"
-        >
+      <div v-if="showModalUbah" class="fixed inset-0 z-30 overflow-y-auto flex justify-center items-start">
+        <div class="bg-bgGray w-[90%] md:w-[60%] p-4 md:py-8 md:px-6 rounded-4xl shadow-lg mt-10 mb-10">
           <div class="flex justify-between">
             <h1 class="text-textDark text-lg font-semibold">Ubah Menu</h1>
-            <p
-              class="text-textDark text-2xl cursor-pointer"
-              @click="closeModalUbah"
-            >
+            <p class="text-textDark text-2xl cursor-pointer" @click="closeModalUbah">
               <i class="fi fi-rr-cross-small"></i>
             </p>
           </div>
@@ -599,21 +496,12 @@ const closeModalHapus = () => {
                 <p>Foto Menu</p>
               </label>
               <div class="relative mt-2">
-                <input
-                  type="file"
-                  id="uploadFotoMenu"
-                  class="hidden"
-                  @change="updateFileName($event, editProductForm)"
-                  ref="fileInput"
-                />
-                <label
-                  for="uploadFotoMenu"
-                  class="flex items-center gap-2 w-full bg-white rounded-full cursor-pointer shadow-sm"
-                >
-                  <span
-                    class="bg-bgGray py-3 px-4 rounded-l-full text-textDark text-sm md:text-base w-[50%]"
-                    >Choose File</span
-                  >
+                <input type="file" id="uploadFotoMenu" class="hidden" @change="updateFileName($event, editProductForm)"
+                  ref="fileInput" />
+                <label for="uploadFotoMenu"
+                  class="flex items-center gap-2 w-full bg-white rounded-full cursor-pointer shadow-sm">
+                  <span class="bg-bgGray py-3 px-4 rounded-l-full text-textDark text-sm md:text-base w-[50%]">Choose
+                    File</span>
                   <span class="text-textGrayDark pr-4 line-clamp-1 w-full">
                     {{ fileName || 'No file chosen' }}
                   </span>
@@ -625,17 +513,10 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="nama-menu" class="text-textDark">Nama Menu</label>
               <div class="relative mt-2">
-                <input
-                  type="text"
-                  v-model="editProductForm.name"
-                  id="nama-menu"
+                <input type="text" v-model="editProductForm.name" id="nama-menu"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                  placeholder="Masukkan Nama Menu"
-                  required
-                />
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-                >
+                  placeholder="Masukkan Nama Menu" required />
+                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                   <p class="text-textDark text-xl">
                     <i class="fi fi-rr-hamburger-soda"></i>
                   </p>
@@ -645,21 +526,12 @@ const closeModalHapus = () => {
 
             <!-- Harga Supplier -->
             <div class="col-span-1">
-              <label for="harga-supplier" class="text-textDark"
-                >Harga Supplier</label
-              >
+              <label for="harga-supplier" class="text-textDark">Harga Supplier</label>
               <div class="relative mt-2">
-                <input
-                  type="number"
-                  v-model="editProductForm.supplier_price"
-                  id="harga-supplier"
+                <input type="number" v-model="editProductForm.supplier_price" id="harga-supplier"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                  placeholder="Masukkan Harga Supplier"
-                  required
-                />
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-                >
+                  placeholder="Masukkan Harga Supplier" required />
+                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                   <p class="text-textDark text-xl">
                     <i class="fi fi-rr-user-salary"></i>
                   </p>
@@ -671,17 +543,10 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="harga-jual" class="text-textDark">Harga Jual</label>
               <div class="relative mt-2">
-                <input
-                  type="number"
-                  id="harga-jual"
-                  v-model="editProductForm.price"
+                <input type="number" id="harga-jual" v-model="editProductForm.price"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                  placeholder="Masukkan Harga Jual"
-                  required
-                />
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-                >
+                  placeholder="Masukkan Harga Jual" required />
+                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                   <p class="text-textDark text-xl">
                     <i class="fi fi-rr-usd-circle"></i>
                   </p>
@@ -693,17 +558,10 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="stok" class="text-textDark">Stok</label>
               <div class="relative mt-2">
-                <input
-                  type="number"
-                  v-model="editProductForm.stock"
-                  id="stok"
+                <input type="number" v-model="editProductForm.stock" id="stok"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                  placeholder="Masukkan Stok"
-                  required
-                />
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-                >
+                  placeholder="Masukkan Stok" required />
+                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                   <p class="text-textDark text-xl">
                     <i class="fi fi-rr-box-open-full"></i>
                   </p>
@@ -715,20 +573,15 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="supplier" class="text-textDark">Supplier</label>
               <div class="relative mt-2">
-                <select
-                  id="supplier"
-                  v-model="editProductForm.supplier_id"
+                <select id="supplier" v-model="editProductForm.supplier_id"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none appearance-none cursor-pointer"
-                  required
-                >
+                  required>
                   <option value="" disabled>Pilih Supplier</option>
                   <option v-for="s in $page.props.suppliers" :value="s.id">
                     {{ s.name }}
                   </option>
                 </select>
-                <div
-                  class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4"
-                >
+                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4">
                   <i class="fi fi-rr-supplier text-textDark text-xl"></i>
                 </div>
               </div>
@@ -738,19 +591,29 @@ const closeModalHapus = () => {
             <div class="col-span-1">
               <label for="status" class="text-textDark">Status</label>
               <div class="relative mt-2">
-                <select
-                  id="status"
-                  v-model="editProductForm.status"
+                <select id="status" v-model="editProductForm.status"
                   class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none appearance-none cursor-pointer"
-                  required
-                >
+                  required>
                   <option value="" disabled selected>Pilih Status</option>
                   <option value="1">Aktif</option>
                   <option value="0">Nonaktif</option>
                 </select>
-                <div
-                  class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4"
-                >
+                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4">
+                  <i class="fi fi-rr-power text-textDark text-xl"></i>
+                </div>
+              </div>
+            </div>
+            <!-- Category -->
+            <div class="col-span-1">
+              <label for="status" class="text-textDark">Category</label>
+              <div class="relative mt-2">
+                <select id="status" v-model="editProductForm.category_id"
+                  class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none appearance-none cursor-pointer"
+                  required>
+                  <option v-for="category in $page.props.categories" :value="category.id" selected>{{ category.name }}
+                  </option>
+                </select>
+                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none ps-4">
                   <i class="fi fi-rr-power text-textDark text-xl"></i>
                 </div>
               </div>
@@ -758,11 +621,8 @@ const closeModalHapus = () => {
 
             <!-- Tombol Simpan -->
             <div class="md:col-span-2 flex justify-end">
-              <button
-                type="submit"
-                @click="submitEdit"
-                class="bg-primary px-12 py-3 rounded-full cursor-pointer translate-x-1.5 hover:brightness-90 duration-300"
-              >
+              <button type="submit" @click="submitEdit"
+                class="bg-primary px-12 py-3 rounded-full cursor-pointer translate-x-1.5 hover:brightness-90 duration-300">
                 <div class="flex justify-center items-center gap-2">
                   <p class="text-textDark text-lg translate-y-0.5">
                     <i class="fi fi-rr-disk"></i>
@@ -778,34 +638,24 @@ const closeModalHapus = () => {
 
     <!-- Modal Konfirmasi Hapus Menu -->
     <Transition name="fade">
-      <div
-        v-if="showModalHapus"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-40"
-        @click="closeModalHapus"
-      ></div>
+      <div v-if="showModalHapus" class="fixed inset-0 bg-black/50 flex items-center justify-center z-40"
+        @click="closeModalHapus"></div>
     </Transition>
 
     <Transition name="scale">
-      <div
-        v-if="showModalHapus"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[80%] max-w-[480px] py-8 px-6 rounded-4xl shadow-lg text-center z-50"
-      >
+      <div v-if="showModalHapus"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[80%] max-w-[480px] py-8 px-6 rounded-4xl shadow-lg text-center z-50">
         <div class="">
           <p class="text-center text-textDark text-xl font-semibold">
             Apakah Anda yakin ingin menghapus menu ini?
           </p>
         </div>
         <div class="flex justify-between mt-4 gap-2">
-          <button
-            @click="closeModalHapus"
-            class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer"
-          >
+          <button @click="closeModalHapus" class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer">
             Batal
           </button>
-          <button
-            @click="deleteProduct"
-            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300"
-          >
+          <button @click="deleteProduct"
+            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300">
             Ya, Hapus
           </button>
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\Supplier;
@@ -70,10 +71,11 @@ class DashboardController extends Controller
             $itemsQuery->where('name', 'like', '%' . $search . '%');
         }
 
-        $items = $itemsQuery->latest()->get();
+        $items = $itemsQuery->with('category')->latest()->get();
 
         return Inertia::render('admin/Menu', [
             'items' => $items,
+            'categories' => Category::all(),
             'filters' => [
                 'search' => $search,
             ],
@@ -117,7 +119,7 @@ class DashboardController extends Controller
         if ($start && $end) {
             $query->whereBetween('created_at', [$start, $end]);
         }
-        $orders = $query->get();
+        $orders = $query->with('items.item')->get();
 
         // === Stats global yang tidak terkait period (tetap) ===
         $activeItemCount = Item::where('stock', '>', 0)->count();
@@ -200,6 +202,25 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function render_category(Request $request)
+    {
+        $search = $request->input('search');
+
+        $categoryQuery = Category::query()->withCount('items');
+
+        if ($search) {
+            $categoryQuery->where('name', 'like', '%' . $search . '%');
+        }
+
+        $categories = $categoryQuery->latest()->get();
+
+        return Inertia::render('admin/Category', [
+            'categories' => $categories,
+            'filters' => [
+                'search' => $search,
+            ],
+        ]);
+    }
     public function render_users(Request $request)
     {
         $search = $request->input('search');

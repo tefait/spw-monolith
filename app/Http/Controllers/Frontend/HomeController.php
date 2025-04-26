@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Item;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,27 +14,27 @@ class HomeController extends Controller
     public function renderHomePage(Request $request)
     {
         $search = $request->input('search');
+        $category = $request->input('category');
 
-        $itemsQuery = Item::query()->where('stock', '>=', 1)->where('status' , true);
+        $itemsQuery = Item::query()->where('stock', '>=', 1)->where('status', true);
 
         if ($search) {
-            $itemsQuery->where('name', 'like', '%'.$search.'%');
+            $itemsQuery->where('name', 'like', '%' . $search . '%');
         }
 
-        $items = $itemsQuery->latest()->get()->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'name' => $item->name,
-                'price' => $item->price,
-                'stock' => $item->stock,
-                'image' => $item->image,
-            ];
-        });
+        if ($category) {
+            $itemsQuery->where('category_id', $category);
+        }
+
+        $items = $itemsQuery->latest()->get();
+        $categories = Category::latest()->get();
 
         return Inertia::render('Home', [
             'items' => $items,
+            'categories' => $categories,
             'filters' => [
                 'search' => $search,
+                'category' => $category,
             ],
         ]);
     }

@@ -8,7 +8,7 @@ import HeaderDashboard from '@/components/HeaderDashboard.vue';
 const page = usePage();
 
 /** Filters */
-const period = ref('this_month');
+const period = ref('');
 const start = ref('');
 const end = ref('');
 
@@ -43,7 +43,7 @@ const filteredOrders = computed(() => {
 /** Format helpers */
 const fmtIDR = (n) => {
   const num = typeof n === 'number' ? n : Number(n || 0);
-  return `Rp${num.toLocaleString('id-ID')}`;
+  return `Rp. ${num.toLocaleString('id-ID')}`;
 };
 const fmtDateTimeID = (iso) => {
   if (!iso) return '-';
@@ -103,6 +103,12 @@ const filterReport = () => {
               <div class="flex flex-wrap gap-3">
                 <label class="flex items-center gap-2 cursor-pointer bg-gray-100 rounded-full py-1.5 px-3">
                   <input id="today" name="notification-method" type="radio" v-model="period"
+                    class="w-4 h-4 border-gray-300 text-primary focus:ring-primary" value=""
+                    aria-labelledby="label-today" />
+                  <span id="label-today" class="text-sm font-medium text-textDark">Semua</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer bg-gray-100 rounded-full py-1.5 px-3">
+                  <input id="today" name="notification-method" type="radio" v-model="period"
                     class="w-4 h-4 border-gray-300 text-primary focus:ring-primary" value="today"
                     aria-labelledby="label-today" />
                   <span id="label-today" class="text-sm font-medium text-textDark">Hari ini</span>
@@ -155,6 +161,7 @@ const filterReport = () => {
                     <th class="px-3 py-3 font-semibold border border-gray-200 text-left">Total</th>
                     <th class="px-3 py-3 font-semibold border border-gray-200 text-left">Payment Method</th>
                     <th class="px-3 py-3 font-semibold border border-gray-200 text-left">Information</th>
+                    <th class="px-3 py-3 font-semibold border border-gray-200 text-left">Products</th>
                   </tr>
                 </thead>
 
@@ -181,6 +188,10 @@ const filterReport = () => {
                     <td class="px-3 py-2 border border-gray-200 align-top max-w-[320px]">
                       {{ order?.notes || '-' }}
                     </td>
+                    <td class="px-3 py-2 border border-gray-200 align-top max-w-[320px]" v-html="order.items
+                      .map(i => `${i.item.name} (${i.quantity} x ${fmtIDR(i.price)})`)
+                      .join('<br>') || '-'">
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -202,31 +213,36 @@ const filterReport = () => {
           </div>
           <main class="mt-2 md:mt-5">
             <h2 class="text-lg font-semibold text-textDark mb-4">Laporan lain</h2>
-            
+
             <!-- Cards row 1 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              <div class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
+              <div
+                class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
                 <div class="space-y-2">
                   <p class="text-textDark">Menu Aktif</p>
                   <h1 class="text-textDark text-3xl font-bold">{{ $page.props.stats.items }}</h1>
                 </div>
-                <p class="text-primary text-5xl group-hover:text-primaryThin"><i class="fi fi-sr-hamburger-soda"></i></p>
+                <p class="text-primary text-5xl group-hover:text-primaryThin"><i class="fi fi-sr-hamburger-soda"></i>
+                </p>
               </div>
-              <div class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
+              <div
+                class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
                 <div class="space-y-2">
                   <p class="text-textDark">Total Pesanan</p> <!-- ✅ bukan "Hari Ini" -->
                   <h1 class="text-textDark text-3xl font-bold">{{ $page.props.stats.orders }}</h1>
                 </div>
                 <p class="text-primary text-5xl group-hover:text-primaryThin"><i class="fi fi-sr-room-service"></i></p>
               </div>
-              <div class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
+              <div
+                class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
                 <div class="space-y-2">
                   <p class="text-textDark">Total Pendapatan</p>
                   <h1 class="text-textDark text-3xl font-bold">{{ fmtIDR($page.props.stats.income) }}</h1>
                 </div>
                 <p class="text-primary text-5xl group-hover:text-primaryThin"><i class="fi fi-sr-sack-dollar"></i></p>
               </div>
-              <div class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
+              <div
+                class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
                 <div class="space-y-2">
                   <p class="text-textDark">Total Keuntungan</p>
                   <h1 class="text-textDark text-3xl font-bold">Rp{{
@@ -238,7 +254,8 @@ const filterReport = () => {
                   </p>
                 </div>
               </div>
-              <div class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
+              <div
+                class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
                 <div class="space-y-2">
                   <p class="text-textDark">Jumlah Supplier</p>
                   <h1 class="text-textDark text-3xl font-bold">
@@ -251,7 +268,8 @@ const filterReport = () => {
                   </p>
                 </div>
               </div>
-              <div class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
+              <div
+                class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
                 <div class="space-y-2">
                   <p class="text-textDark">Pengguna Terdaftar</p>
                   <h1 class="text-textDark text-3xl font-bold">

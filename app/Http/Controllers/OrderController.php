@@ -201,7 +201,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
-            return redirect()->back()->with(['success' => 'Pesanan berhasil ditambahkan, silahkan lanjut dihalaman pesanan.']);
+            return redirect('kasir/riwayat')->with(['success' => 'Pesanan berhasil ditambahkan, silahkan lanjut dihalaman pesanan.']);
             event(new NewOrderCreated($order->load('items.item', 'payment')));
             // return redirect()->back()->with('Berhasil', [
             //     'success' => true,

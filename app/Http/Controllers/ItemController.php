@@ -79,6 +79,9 @@ class ItemController extends Controller
     public function destroy(Item $item)
     {
         $item->delete();
+        if (Storage::disk('public')->exists($item->getRawOriginal('image'))) {
+            Storage::disk('public')->delete($item->getRawOriginal('image'));
+        }
         return redirect()->back()->with('success', 'Menu berhasil dihapus!');
     }
 }

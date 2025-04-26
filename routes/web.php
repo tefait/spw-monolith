@@ -12,12 +12,14 @@ use App\Http\Controllers\Auth\{
     VerifyEmailController
 };
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierController;
+use App\Models\Category;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -82,6 +84,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengaturan-akun', fn() => Inertia::render('PengaturanAkun'))->name('pengaturan-akun');
     Route::get('/admin/dashboard', [DashboardController::class, 'render_home'])->middleware('role:admin')->name('dashboard');
     Route::get('/admin/menu', [DashboardController::class, 'render_menu'])->middleware('role:admin')->name('dashboard.menu');
+    Route::get('/admin/kategori', [DashboardController::class, 'render_category'])->middleware('role:admin')->name('dashboard.category');
     Route::get('/admin/supplier', [DashboardController::class, 'render_supplier'])->middleware('role:admin')->name('dashboard.supplier');
     Route::get('/admin/pengguna', [DashboardController::class, 'render_users'])->middleware('role:admin')->name('dashboard.pengguna');
 
@@ -245,4 +248,9 @@ Route::middleware('auth')->group(function () {
     Route::post('supplier/store', [SupplierController::class, 'store'])->name('store.supplier')->middleware('role:admin,staff');
     Route::put('supplier/update/{supplier}', [SupplierController::class, 'update'])->name('update.supplier')->middleware('role:admin,staff');
     Route::delete('supplier/delete/{supplier}', [SupplierController::class, 'destroy'])->name('delete.supplier')->middleware('role:admin,staff');
+    
+    Route::delete('category/delete/{category}', [CategoryController::class, 'destroy'])->name('delete.category')->middleware('role:admin,staff');
+    Route::post('category/store', [CategoryController::class, 'store'])->name('store.category')->middleware('role:admin,staff');
+    Route::put('category/update/{category}', [CategoryController::class, 'update'])->name('update.category')->middleware('role:admin,staff');
+    Route::post('category/toggle/{category}', [CategoryController::class, 'toggleActiveState'])->name('toggle.category')->middleware('role:admin,staff');
 });
