@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewOrderCreated;
 use App\Models\Cart;
 use App\Models\Item;
 use App\Models\Order;
@@ -109,18 +110,18 @@ class OrderController extends Controller
                     'total_amount' => $order->total_amount,
                     'notes' => $order->notes,
                     'created_at' => now()->toDateTimeString(),
-                ]; 
+                ];
                 cookie()->queue(cookie('transactions', json_encode($transactions), 60 * 24 * 30)); // Simpan selama 30 hari
                 cookie()->queue(cookie()->forget('cart')); // Hapus cart cookie
             }
-
             DB::commit();
 
 
             if ($request->input('source') === 'kasir') {
                 return redirect('/kasir/berhasil')->with('success', 'Pesanan berhasil ditambahkan, silahkan lanjut dihalaman pesanan.');
             }
-
+            
+            event(new NewOrderCreated($order->load('items.item', 'payment')));
             return Inertia::render('Berhasil', [
                 'order' => $order,
                 'total' => $total,

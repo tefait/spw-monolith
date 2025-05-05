@@ -59,7 +59,7 @@ const submitEdit = () =>
       push.success(page.props.flash.success);
     },
     onError: (error) => {
-      console.warn('error', error);
+      console.error('Cannot edit menu sorry:(', error);
     },
   });
 const dropdownRef = ref(null);

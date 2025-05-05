@@ -21,9 +21,9 @@ const saveNewSupplier = () => {
       closeModalTambah();
       push.success(usePage().props.flash.success);
     },
-    onError: () => {
+    onError: (error) => {
       push.error('Gagal menyimpan supplier');
-      console.log('Error saving supplier');
+      console.error('Error saving supplier', error);
     },
   });
 };
@@ -118,23 +118,16 @@ const deleteSupplier = () => {
 </script>
 
 <template>
-  <div
-    class="bg-bgGray min-h-screen md:ps-[150px] p-4 md:pe-4 pt-[18px] pb-24 md:pb-0"
-  >
+  <div class="bg-bgGray min-h-screen md:ps-[150px] p-4 md:pe-4 pt-[18px] pb-24 md:pb-0">
     <HeaderDashboard @openModalKeluar="openModalKeluar" />
 
     <section class="mt-4 w-full">
       <div class="md:flex justify-between">
         <div class="">
           <div class="w-full md:w-96 relative">
-            <input
-              type="search"
-              class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-              placeholder="Cari supplier"
-            />
-            <div
-              class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-            >
+            <input type="search" class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
+              placeholder="Cari supplier" />
+            <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
               <p class="text-textDark text-xl">
                 <i class="fi fi-rr-search"></i>
               </p>
@@ -142,10 +135,8 @@ const deleteSupplier = () => {
           </div>
         </div>
         <div class="mt-4 md:mt-0">
-          <button
-            @click="openModalTambah"
-            class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300"
-          >
+          <button @click="openModalTambah"
+            class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300">
             <p class="text-textDark text-sm translate-y-0.5">
               <i class="fi fi-rr-plus"></i>
             </p>
@@ -159,11 +150,8 @@ const deleteSupplier = () => {
       <div>
         <h1 class="text-textDark text-lg font-semibold">Daftar Supplier</h1>
         <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-4">
-          <div
-            v-for="supplier in $page.props.suppliers"
-            @click="openModalDetail(supplier)"
-            class="col-span-1 bg-white p-6 mt-4 rounded-3xl flex items-center gap-4 text-start cursor-pointer"
-          >
+          <div v-for="supplier in $page.props.suppliers" @click="openModalDetail(supplier)"
+            class="col-span-1 bg-white p-6 mt-4 rounded-3xl flex items-center gap-4 text-start cursor-pointer">
             <div class="h-14 w-14 rounded-full overflow-hidden">
               <img src="/assets/images/user.webp" alt="user" />
             </div>
@@ -187,24 +175,16 @@ const deleteSupplier = () => {
 
     <!-- Modal Detail Supplier -->
     <Transition name="fade">
-      <div
-        v-if="showModalDetail"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
-        @click="closeModalDetail"
-      ></div>
+      <div v-if="showModalDetail" class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
+        @click="closeModalDetail"></div>
     </Transition>
 
     <Transition name="scale">
-      <div
-        v-if="showModalDetail"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[90%] md:w-[35%] py-8 px-6 rounded-4xl shadow-lg text-center z-30"
-      >
+      <div v-if="showModalDetail"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[90%] md:w-[35%] py-8 px-6 rounded-4xl shadow-lg text-center z-30">
         <div class="flex justify-between">
           <h1 class="text-textDark text-lg font-semibold">Detail Supplier</h1>
-          <p
-            class="text-textDark text-2xl cursor-pointer"
-            @click="closeModalDetail"
-          >
+          <p class="text-textDark text-2xl cursor-pointer" @click="closeModalDetail">
             <i class="fi fi-rr-cross-small"></i>
           </p>
         </div>
@@ -231,10 +211,8 @@ const deleteSupplier = () => {
           </div>
         </div>
         <div class="flex justify-between mt-4 gap-2">
-          <button
-            @click="openModalUbah"
-            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300"
-          >
+          <button @click="openModalUbah"
+            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300">
             <div class="flex justify-center items-center gap-2">
               <p class="text-lg translate-y-0.5">
                 <i class="fi fi-rr-edit"></i>
@@ -242,10 +220,7 @@ const deleteSupplier = () => {
               <p>Ubah</p>
             </div>
           </button>
-          <button
-            @click="openModalHapus"
-            class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer"
-          >
+          <button @click="openModalHapus" class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer">
             <div class="flex justify-center items-center gap-2">
               <p class="text-lg translate-y-0.5">
                 <i class="fi fi-rr-trash"></i>
@@ -259,44 +234,27 @@ const deleteSupplier = () => {
 
     <!-- Modal Tambah Supplier -->
     <Transition name="fade">
-      <div
-        v-if="showModalTambah"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
-        @click="closeModalTambah"
-      ></div>
+      <div v-if="showModalTambah" class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
+        @click="closeModalTambah"></div>
     </Transition>
 
     <Transition name="scale">
-      <div
-        v-if="showModalTambah"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-bgGray w-[90%] md:w-[35%] py-8 px-6 rounded-4xl shadow-lg z-30"
-      >
+      <div v-if="showModalTambah"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-bgGray w-[90%] md:w-[35%] py-8 px-6 rounded-4xl shadow-lg z-30">
         <div class="flex justify-between">
           <h1 class="text-textDark text-lg font-semibold">Tambah Supplier</h1>
-          <p
-            class="text-textDark text-2xl cursor-pointer"
-            @click="closeModalTambah"
-          >
+          <p class="text-textDark text-2xl cursor-pointer" @click="closeModalTambah">
             <i class="fi fi-rr-cross-small"></i>
           </p>
         </div>
         <div class="space-y-4 mt-4">
           <div class="col-span-1">
-            <label for="nama-supplier" class="text-textDark"
-              >Nama Supplier</label
-            >
+            <label for="nama-supplier" class="text-textDark">Nama Supplier</label>
             <div class="relative mt-2">
-              <input
-                type="text"
-                id="nama-supplier"
-                v-model="newSupplier.name"
+              <input type="text" id="nama-supplier" v-model="newSupplier.name"
                 class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                placeholder="Masukkan Nama Supplier"
-                required
-              />
-              <div
-                class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-              >
+                placeholder="Masukkan Nama Supplier" required />
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                 <p class="text-textDark text-xl">
                   <i class="fi fi-rr-supplier"></i>
                 </p>
@@ -304,21 +262,12 @@ const deleteSupplier = () => {
             </div>
           </div>
           <div class="col-span-1">
-            <label for="nomor-whatsapp" class="text-textDark"
-              >Nomor WhatsApp</label
-            >
+            <label for="nomor-whatsapp" class="text-textDark">Nomor WhatsApp</label>
             <div class="relative mt-2">
-              <input
-                type="tel"
-                id="nomor-whatsapp"
+              <input type="tel" id="nomor-whatsapp"
                 class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                v-model="newSupplier.whatsapp_number"
-                placeholder="Masukkan Nomor WhatsApp"
-                required
-              />
-              <div
-                class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-              >
+                v-model="newSupplier.whatsapp_number" placeholder="Masukkan Nomor WhatsApp" required />
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                 <p class="text-textDark text-xl">
                   <i class="fi fi-brands-whatsapp"></i>
                 </p>
@@ -326,11 +275,8 @@ const deleteSupplier = () => {
             </div>
           </div>
           <div class="flex justify-end items-end mt-4">
-            <button
-              type="submit"
-              @click="saveNewSupplier"
-              class="bg-primary px-12 py-3 rounded-full cursor-pointer translate-x-1.5 hover:brightness-90 duration-300"
-            >
+            <button type="submit" @click="saveNewSupplier"
+              class="bg-primary px-12 py-3 rounded-full cursor-pointer translate-x-1.5 hover:brightness-90 duration-300">
               <div class="flex justify-center items-center gap-2">
                 <p class="text-textDark text-lg translate-y-0.5">
                   <i class="fi fi-rr-disk"></i>
@@ -345,44 +291,27 @@ const deleteSupplier = () => {
 
     <!-- Modal Ubah Supplier -->
     <Transition name="fade">
-      <div
-        v-if="showModalUbah"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
-        @click="closeModalUbah"
-      ></div>
+      <div v-if="showModalUbah" class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
+        @click="closeModalUbah"></div>
     </Transition>
 
     <Transition name="scale">
-      <div
-        v-if="showModalUbah"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-bgGray w-[90%] md:w-[35%] py-8 px-6 rounded-4xl shadow-lg z-30"
-      >
+      <div v-if="showModalUbah"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-bgGray w-[90%] md:w-[35%] py-8 px-6 rounded-4xl shadow-lg z-30">
         <div class="flex justify-between">
           <h1 class="text-textDark text-lg font-semibold">Ubah Supplier</h1>
-          <p
-            class="text-textDark text-2xl cursor-pointer"
-            @click="closeModalUbah"
-          >
+          <p class="text-textDark text-2xl cursor-pointer" @click="closeModalUbah">
             <i class="fi fi-rr-cross-small"></i>
           </p>
         </div>
         <div class="space-y-4 mt-4">
           <div class="col-span-1">
-            <label for="nama-supplier" class="text-textDark"
-              >Nama Supplier</label
-            >
+            <label for="nama-supplier" class="text-textDark">Nama Supplier</label>
             <div class="relative mt-2">
-              <input
-                type="name"
-                id="nama-supplier"
-                v-model="editSupplierForm.name"
+              <input type="name" id="nama-supplier" v-model="editSupplierForm.name"
                 class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                placeholder="Masukkan Nama Supplier"
-                required
-              />
-              <div
-                class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-              >
+                placeholder="Masukkan Nama Supplier" required />
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                 <p class="text-textDark text-xl">
                   <i class="fi fi-rr-supplier"></i>
                 </p>
@@ -390,21 +319,12 @@ const deleteSupplier = () => {
             </div>
           </div>
           <div class="col-span-1">
-            <label for="nomor-whatsapp" class="text-textDark"
-              >Nomor WhatsApp</label
-            >
+            <label for="nomor-whatsapp" class="text-textDark">Nomor WhatsApp</label>
             <div class="relative mt-2">
-              <input
-                type="tel"
-                id="nomor-whatsapp"
-                v-model="editSupplierForm.whatsapp_number"
+              <input type="tel" id="nomor-whatsapp" v-model="editSupplierForm.whatsapp_number"
                 class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-                placeholder="Masukkan Nomor WhatsApp"
-                required
-              />
-              <div
-                class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1"
-              >
+                placeholder="Masukkan Nomor WhatsApp" required />
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
                 <p class="text-textDark text-xl">
                   <i class="fi fi-brands-whatsapp"></i>
                 </p>
@@ -412,11 +332,8 @@ const deleteSupplier = () => {
             </div>
           </div>
           <div class="flex justify-end items-end mt-4">
-            <button
-              type="submit"
-              @click="saveEditedSupplier"
-              class="bg-primary px-12 py-3 rounded-full cursor-pointer translate-x-1.5 hover:brightness-90 duration-300"
-            >
+            <button type="submit" @click="saveEditedSupplier"
+              class="bg-primary px-12 py-3 rounded-full cursor-pointer translate-x-1.5 hover:brightness-90 duration-300">
               <div class="flex justify-center items-center gap-2">
                 <p class="text-textDark text-lg translate-y-0.5">
                   <i class="fi fi-rr-disk"></i>
@@ -431,34 +348,24 @@ const deleteSupplier = () => {
 
     <!-- Modal Konfirmasi Hapus Supplier -->
     <Transition name="fade">
-      <div
-        v-if="showModalHapus"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-40"
-        @click="closeModalHapus"
-      ></div>
+      <div v-if="showModalHapus" class="fixed inset-0 bg-black/50 flex items-center justify-center z-40"
+        @click="closeModalHapus"></div>
     </Transition>
 
     <Transition name="scale">
-      <div
-        v-if="showModalHapus"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[80%] max-w-[480px] py-8 px-6 rounded-4xl shadow-lg text-center z-50"
-      >
+      <div v-if="showModalHapus"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[80%] max-w-[480px] py-8 px-6 rounded-4xl shadow-lg text-center z-50">
         <div class="">
           <p class="text-center text-textDark text-xl font-semibold">
             Apakah Anda yakin ingin menghapus supplier ini?
           </p>
         </div>
         <div class="flex justify-between mt-4 gap-2">
-          <button
-            @click="closeModalHapus"
-            class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer"
-          >
+          <button @click="closeModalHapus" class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer">
             Batal
           </button>
-          <button
-            @click="deleteSupplier"
-            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300"
-          >
+          <button @click="deleteSupplier"
+            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300">
             Ya, Hapus
           </button>
         </div>
@@ -467,35 +374,26 @@ const deleteSupplier = () => {
 
     <!-- Backdrop Modal Konfirmasi Keluar -->
     <Transition name="fade">
-      <div
-        v-if="showModalKeluar"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
-        @click="closeModalKeluar"
-      ></div>
+      <div v-if="showModalKeluar" class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
+        @click="closeModalKeluar"></div>
     </Transition>
 
     <!-- Modal Konfirmasi Keluar -->
     <Transition name="scale">
-      <div
-        v-if="showModalKeluar"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[80%] max-w-[480px] py-8 px-6 rounded-4xl shadow-lg text-center z-30"
-      >
+      <div v-if="showModalKeluar"
+        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[80%] max-w-[480px] py-8 px-6 rounded-4xl shadow-lg text-center z-30">
         <div class="">
           <p class="text-center text-textDark text-xl font-semibold">
             Apakah Anda yakin ingin keluar?
           </p>
         </div>
         <div class="flex justify-between mt-4 gap-2">
-          <button
-            @click="closeModalKeluar"
-            class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer"
-          >
+          <button @click="closeModalKeluar" class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer">
             Batal
           </button>
           <button
             class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300"
-            @click="$inertia.post('/logout')"
-          >
+            @click="$inertia.post('/logout')">
             Keluar
           </button>
         </div>

@@ -20,9 +20,9 @@ const saveNewSupplier = () => {
       closeModalTambah();
       push.success(usePage().props.flash.success);
     },
-    onError: () => {
+    onError: (error) => {
       push.error('Gagal menyimpan supplier');
-      console.log('Error saving supplier');
+      console.error('Error saving supplier', error);
     },
   });
 };
