@@ -154,9 +154,6 @@ const closeModal = () => {
       </div>
     </section>
 
-    <div class="mt-4">
-      <p class="text-textGrayDark text-center text-sm">Versi 1.0.0</p>
-    </div>
   </main>
 
   <!-- Background Hitam dengan Opacity -->

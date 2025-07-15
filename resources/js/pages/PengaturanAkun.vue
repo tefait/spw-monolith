@@ -12,16 +12,6 @@ const form = useForm({
   password_confirmation: '',
 });
 
-const goBack = () => {
-  const referrer = document.referrer;
-  if (referrer && referrer.includes(window.location.hostname)) {
-    window.history.back();
-    window.history.back();
-  } else {
-    router.visit('/');
-  }
-};
-
 const submit = () => {
   form.put('/password/update', {
     preserveScroll: true,
@@ -36,13 +26,7 @@ const submit = () => {
     <Head title="Pengaturan akun" />
 
     <section class="bg-primary w-full p-4">
-      <div class="flex items-center">
-        <p
-          class="text-textDark text-2xl translate-y-0.5 cursor-pointer"
-          @click="goBack"
-        >
-          <i class="fi fi-rr-arrow-left"></i>
-        </p>
+      <div class="flex items-center py-3.5">
         <h1
           class="text-textDark text-lg font-semibold absolute left-1/2 -translate-x-1/2"
         >

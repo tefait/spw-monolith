@@ -119,7 +119,7 @@ const deleteSupplier = () => {
 
 <template>
   <div class="bg-bgGray min-h-screen md:ps-[150px] p-4 md:pe-4 pt-[18px] pb-24 md:pb-0">
-    <HeaderDashboard @openModalKeluar="openModalKeluar" />
+    <HeaderDashboard/>
 
     <section class="mt-4 w-full">
       <div class="md:flex justify-between">

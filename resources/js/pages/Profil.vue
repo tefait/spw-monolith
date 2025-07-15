@@ -3,15 +3,6 @@ import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { push } from 'notivue';
 import { ref } from 'vue';
 
-const goBack = () => {
-  const ref = document.referrer;
-  if (ref && ref.includes(window.location.hostname)) {
-    window.history.back();
-    window.history.back();
-  } else {
-    router.visit('/');
-  }
-};
 const page = usePage();
 const user = page.props.auth.user;
 const fileName = ref('');
@@ -66,10 +57,7 @@ const submitForm = () => {
 
   <div class="bg-bgGray min-h-screen pb-4">
     <section class="bg-primary w-full p-4">
-      <div class="flex items-center">
-        <p class="text-textDark text-2xl translate-y-0.5 cursor-pointer" @click="goBack">
-          <i class="fi fi-rr-arrow-left"></i>
-        </p>
+      <div class="flex items-center py-3.5">
         <h1 class="text-textDark text-lg font-semibold absolute left-1/2 -translate-x-1/2">
           Profil Saya
         </h1>

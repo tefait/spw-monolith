@@ -104,9 +104,6 @@ const showPassword = ref(false);
             </Link>
           </p>
         </div>
-        <div class="mt-8">
-          <p class="text-textGrayDark text-center text-sm">Versi 1.0.0</p>
-        </div>
         <Link
           href="/pusat-bantuan"
           class="fixed z-10 bottom-0 right-0 -translate-y-24 -translate-x-4 py-4 px-6 bg-white shadow-sm rounded-full hover:brightness-90 duration-300"

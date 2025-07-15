@@ -83,7 +83,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/supplier', [DashboardController::class, 'render_supplier'])->middleware('role:admin')->name('dashboard.supplier');
     Route::get('/admin/pengguna', [DashboardController::class, 'render_users'])->middleware('role:admin')->name('dashboard.pengguna');
 
-    // Aneh ga jalan😭
     Route::get('/admin/pengaturan', fn() => Inertia::render('admin/Pengaturan'))->middleware('role:admin');
     Route::get('/admin/laporan', fn() => Inertia::render('admin/Laporan'))->middleware('role:admin');
 

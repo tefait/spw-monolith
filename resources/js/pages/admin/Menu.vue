@@ -158,20 +158,11 @@ const openModalHapus = () => {
 const closeModalHapus = () => {
   showModalHapus.value = false;
 };
-
-// Modal Konfirmasi Keluar
-const showModalKeluar = ref(false);
-const openModalKeluar = () => {
-  showModalKeluar.value = true;
-};
-const closeModalKeluar = () => {
-  showModalKeluar.value = false;
-};
 </script>
 
 <template>
   <div class="bg-bgGray min-h-screen md:ps-[150px] p-4 md:pe-4 pt-[18px] pb-24">
-    <HeaderDashboard @openModalKeluar="openModalKeluar" />
+    <HeaderDashboard />
 
     <section class="mt-4 w-full">
       <div class="md:flex justify-between">
@@ -816,43 +807,6 @@ const closeModalKeluar = () => {
             class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300"
           >
             Ya, Hapus
-          </button>
-        </div>
-      </div>
-    </Transition>
-
-    <!-- Backdrop Modal Konfirmasi Keluar -->
-    <Transition name="fade">
-      <div
-        v-if="showModalKeluar"
-        class="fixed inset-0 bg-black/50 flex items-center justify-center z-20"
-        @click="closeModalKeluar"
-      ></div>
-    </Transition>
-
-    <!-- Modal Konfirmasi Keluar -->
-    <Transition name="scale">
-      <div
-        v-if="showModalKeluar"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-white w-[80%] max-w-[480px] py-8 px-6 rounded-4xl shadow-lg text-center z-30"
-      >
-        <div class="">
-          <p class="text-center text-textDark text-xl font-semibold">
-            Apakah Anda yakin ingin keluar?
-          </p>
-        </div>
-        <div class="flex justify-between mt-4 gap-2">
-          <button
-            @click="closeModalKeluar"
-            class="w-full text-secondary py-3 rounded-full font-medium cursor-pointer"
-          >
-            Batal
-          </button>
-          <button
-            class="w-full bg-primary text-textDark py-3 rounded-full font-medium cursor-pointer hover:brightness-90 duration-300"
-            @click="$inertia.post('/logout')"
-          >
-            Keluar
           </button>
         </div>
       </div>
