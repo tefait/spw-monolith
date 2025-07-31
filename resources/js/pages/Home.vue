@@ -80,8 +80,29 @@ onUnmounted(() => {
       <img src="/assets/images/SPANDUK SPW SECONDARY.webp" alt="SPANDUK SPW" />
     </section>
 
-    <!-- Product List -->
     <section class="bg-bgGray py-5 px-4 rounded-t-4xl -translate-y-7 space-y-4">
+      <!-- Category -->
+      <h1 class="text-textDark text-lg font-bold mb-2">Kategori</h1>
+      <div class="overflow-x-auto flex gap-3 pb-4 scroll-smooth">
+        <div class="flex gap-2.5 w-max">
+          <button class="flex-shrink-0 flex flex-col items-center bg-white p-2 rounded-2xl min-w-[70px] max-w-[90px] gap-2 hover:bg-primary active:bg-primary focus:bg-primary duration-300">
+            <img class="h-10 w-10" src="/assets/images/makanan.png" alt="Makanan">
+            <p class="text-textDark text-xs text-center">Nasi</p>
+          </button>
+          <button class="flex-shrink-0 flex flex-col items-center bg-white p-2 rounded-2xl min-w-[70px] max-w-[90px] gap-2 hover:bg-primary active:bg-primary focus:bg-primary duration-300">
+            <img class="h-10 w-10" src="/assets/images/makanan.png" alt="Makanan">
+            <p class="text-textDark text-xs text-center">Snack</p>
+          </button>
+          <button class="flex-shrink-0 flex flex-col items-center bg-white p-2 rounded-2xl min-w-[70px] max-w-[90px] gap-2 hover:bg-primary active:bg-primary focus:bg-primary duration-300">
+            <img class="h-10 w-10" src="/assets/images/makanan.png" alt="Makanan">
+            <p class="text-textDark text-xs text-center">Minuman</p>
+          </button>
+        </div>
+      </div>
+      <!-- Category -->
+
+
+    <!-- Product List -->
       <h1 class="text-textDark text-lg font-bold">
         {{
           !displayedSearch
