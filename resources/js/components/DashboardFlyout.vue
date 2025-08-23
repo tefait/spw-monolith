@@ -13,16 +13,22 @@
         <div class="px-4 py-2 text-xs font-semibold text-textGray-dark uppercase tracking-wide">
           Hak Admin
         </div>
-        <Link href="/kasir/dashboard"
+        <Link href="/admin/dashboard" v-if="!isAdminPage"
+          class="flex items-center py-2.5 px-4 gap-4 hover:bg-bgGray rounded-2xl duration-300">
+        <p class="text-textDark text-lg"><i class="fi fi-rr-exchange"></i></p>
+        <p class="text-textDark">Menjadi Admin</p>
+        </Link>
+        <Link href="/kasir/dashboard" v-if="!isKasirPage"
           class="flex items-center py-2.5 px-4 gap-4 hover:bg-bgGray rounded-2xl duration-300">
         <p class="text-textDark text-lg"><i class="fi fi-rr-exchange"></i></p>
         <p class="text-textDark">Menjadi Kasir</p>
         </Link>
-        <Link href="/pelayan/dashboard"
+        <Link href="/pelayan/dashboard" v-if="!isPelayanPage"
           class="flex items-center py-2.5 px-4 gap-4 hover:bg-bgGray rounded-2xl duration-300">
         <p class="text-textDark text-lg"><i class="fi fi-rr-exchange"></i></p>
         <p class="text-textDark">Menjadi Pelayan</p>
         </Link>
+
 
         <!-- Divider -->
         <div class="border-t border-textGray mt-2 mb-1 md:mx-4"></div>
@@ -78,7 +84,8 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
 import { defineModel, ref } from 'vue';
 
 const show = defineModel();
@@ -87,4 +94,12 @@ const confirmLogout = ref(false);
 const closeModalKeluar = () => {
   confirmLogout.value = false;
 };
+
+// akses current url
+const currentUrl = computed(() => usePage().url);
+
+// cek posisi halaman
+const isKasirPage = computed(() => currentUrl.value.startsWith('/kasir'));
+const isAdminPage = computed(() => currentUrl.value.startsWith('/admin'));
+const isPelayanPage = computed(() => currentUrl.value.startsWith('/pelayan'));
 </script>

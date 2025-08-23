@@ -51,7 +51,7 @@ const route = { path: page.url };
       <Link
         href="/admin/laporan"
         :class="
-          route.path === '/admin/laporan'
+          route.path.startsWith('/admin/laporan')
             ? 'bg-primary text-textDark'
             : 'bg-transparent text-textGrayDark'
         "

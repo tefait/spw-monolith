@@ -86,38 +86,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/pengguna', [DashboardController::class, 'render_users'])->middleware('role:admin')->name('dashboard.pengguna');
 
     Route::get('/admin/pengaturan', fn() => Inertia::render('admin/Pengaturan'))->middleware('role:admin');
-    Route::get('/admin/laporan', function (Request $request) {
-        $query = Order::query()->with('user');
-
-        if ($request->has('period')) {
-            switch ($request->period) {
-                case 'today':
-                    $query->whereDate('created_at', Carbon::today());
-                    break;
-
-                case 'this_month':
-                    $query->whereMonth('created_at', Carbon::now()->month)
-                        ->whereYear('created_at', Carbon::now()->year);
-                    break;
-
-                case 'custom':
-                    if ($request->filled(['start', 'end'])) {
-                        $query->whereBetween('created_at', [
-                            Carbon::parse($request->start)->startOfDay(),
-                            Carbon::parse($request->end)->endOfDay(),
-                        ]);
-                    }
-                    break;
-            }
-        }
-
-        $orders = $query->get();
-
-        return Inertia::render('admin/Laporan', [
-            'orders' => $orders,
-            'filters' => $request->only(['period', 'start', 'end']),
-        ]);
-    })->middleware('role:admin');
+    Route::get('/admin/laporan',[DashboardController::class, 'render_report_page'])->middleware('role:admin');
 
 
 
