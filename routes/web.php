@@ -86,7 +86,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/pengguna', [DashboardController::class, 'render_users'])->middleware('role:admin')->name('dashboard.pengguna');
 
     Route::get('/admin/pengaturan', fn() => Inertia::render('admin/Pengaturan'))->middleware('role:admin');
-    Route::get('/admin/laporan',[DashboardController::class, 'render_report_page'])->middleware('role:admin');
+    Route::get('/admin/laporan', [DashboardController::class, 'render_report_page'])->middleware('role:admin');
 
 
 
@@ -189,6 +189,7 @@ Route::middleware('auth')->group(function () {
         return redirect()->back()->with('success', 'Mantap! Pengguna berhasil diperbarui');
     });
     // Kasir
+    Route::post('/kasir/checkout', [OrderController::class, 'CheckoutKasir'])->name('checkout');
     Route::get('/kasir/dashboard', [DashboardController::class, 'render_kasir_dashboard'])->name('kasir.dashboard')->middleware('role:kasir,admin');
     Route::get('/kasir/pesanan', [DashboardController::class, 'render_kasir_orders'])->name('kasir.pesanan')->middleware('role:kasir,admin');
     Route::get('/kasir/riwayat', [DashboardController::class, 'render_kasir_history'])->name('kasir.riwayat')->middleware('role:kasir,admin');

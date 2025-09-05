@@ -118,14 +118,96 @@ class OrderController extends Controller
 
 
             if ($request->input('source') === 'kasir') {
-                return redirect('/kasir/berhasil')->with('success', 'Pesanan berhasil ditambahkan, silahkan lanjut dihalaman pesanan.');
+                return redirect('/kasir/pesanan')->with('success', 'Pesanan berhasil ditambahkan, silahkan lanjut dihalaman pesanan.');
             }
-            
+
             event(new NewOrderCreated($order->load('items.item', 'payment')));
             return Inertia::render('Berhasil', [
                 'order' => $order,
                 'total' => $total,
             ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()->withErrors(['checkout_error' => $e->getMessage()]);
+        }
+    }
+
+    public function checkoutKasir(Request $request)
+    {
+        $data = $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'whatsapp_number' => 'required|max:255',
+            'notes' => 'nullable|string|max:255',
+            'payment_method' => 'required|in:qris,cash',
+            'carts' => 'nullable|array',
+            'source' => 'nullable|string',
+        ]);
+        if (Str::startsWith($data['whatsapp_number'], '08')) {
+            $data['whatsapp_number'] = preg_replace('/^08/', '628', $data['whatsapp_number']);
+        } elseif (Str::startsWith($data['whatsapp_number'], '8')) {
+            $data['whatsapp_number'] = '62' . $data['whatsapp_number'];
+        }
+
+        $carts = collect($request->input('carts'))->map(function ($cartItem) {
+            $item = Item::find($cartItem['item_id']);
+
+            return $item ? (object) [
+                'item' => $item,
+                'amount' => $cartItem['amount'],
+            ] : null;
+        })->filter();
+
+        if ($carts->isEmpty()) {
+            return redirect()->back()->withErrors(['checkout_error' => 'Keranjang kosong.']);
+        }
+
+        $total = $carts->sum(fn($cart) => $cart->item->price * $cart->amount);
+
+        DB::beginTransaction();
+        try {
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'transaction_code' => 'SPW' . now()->format('Ymd') . '-' . random_int(100000, 999999),
+                'customer_name' => $data['customer_name'],
+                'user_has_account' => Auth::check(),
+                'whatsapp_number' => $data['whatsapp_number'],
+                'email' => $data['email'],
+                'status' => 'done',
+                'payment_method' => $data['payment_method'],
+                'notes' => $data['notes'],
+                'total_amount' => $total,
+            ]);
+
+            foreach ($carts as $cart) {
+                $item = $cart->item;
+                if ($item->stock < $cart->amount) {
+                    throw new \Exception("Stok produk {$item->name} tidak mencukupi.");
+                }
+
+                // Kurangi stok dan tambah sold
+                $item->decrement('stock', $cart->amount);
+                $item->increment('sold', $cart->amount);
+
+                // Buat order item
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'item_id' => $item->id,
+                    'quantity' => $cart->amount,
+                    'price' => $item->price,
+                    'supplier_price' => $item->supplier_price,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->back()->with(['success' => 'Pesanan berhasil ditambahkan, silahkan lanjut dihalaman pesanan.']);
+            event(new NewOrderCreated($order->load('items.item', 'payment')));
+            // return redirect()->back()->with('Berhasil', [
+            //     'success' => true,
+            //     'order' => $order,
+            //     'total' => $total,
+            // ]);
         } catch (\Exception $e) {
             DB::rollBack();
 
