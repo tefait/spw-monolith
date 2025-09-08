@@ -58,13 +58,22 @@ onUnmounted(() => {
     <Head title="Beranda" />
 
     <!-- Hero Section -->
-    <section class="bg-primary py-6 px-4 space-y-5">
-      <div class="flex justify-between">
-        <h1 class="text-lg font-semibold text-textDark">Selamat Datang</h1>
-        <Link href="/keranjang" class="text-textDark text-2xl">
-        <i class="fi fi-rr-shopping-cart"></i>
-        </Link>
+    <section class="bg-primary py-6 px-4 space-y-7">
+      <div class="relative flex items-center justify-between w-full">
+        <div class="w-10"></div>
+
+        <h1 class="absolute w-80 left-1/2 transform -translate-x-1/2 text-lg font-semibold text-textDark text-center">
+          E-Commerce TEFA & SPW<br>
+          <b>SMKN 2 SUMEDANG</b>
+        </h1>
+
+        <div>
+          <Link href="/keranjang" class="text-textDark text-2xl">
+            <i class="fi fi-rr-shopping-cart"></i>
+          </Link>
+        </div>
       </div>
+
 
       <div class="relative">
         <input v-model="search" type="search"
