@@ -115,12 +115,13 @@ const print = async () => {
   combinedBuffer.set(cutBuffer, textBuffer.length);
 
   try {
-    const chunkSize = 512;
+    const chunkSize = 128; // or even 20 if still failing
     for (let i = 0; i < combinedBuffer.length; i += chunkSize) {
       const chunk = combinedBuffer.slice(i, i + chunkSize);
-      await characteristic.value.writeValue(chunk);
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await characteristic.value.writeValueWithoutResponse(chunk); // faster, safer for Android
+      await new Promise(resolve => setTimeout(resolve, 50)); // give printer time
     }
+
 
     console.log('✅ Printed and cut successfully');
   } catch (err) {
@@ -376,7 +377,7 @@ onBeforeUnmount(() => {
                   Total:
                   <span class="font-bold">Rp{{
                     Number(ORDER.total_amount).toLocaleString('id-ID')
-                    }}</span>
+                  }}</span>
                 </p>
               </div>
 
@@ -425,29 +426,29 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
               </div>
-                <div class="relative h-full mt-4">
-                  <!-- Trigger button -->
-                  <button @click.prevent="PrintOptions=!PrintOptions"
-                    class="absolute bottom-0 bg-primaryThin py-3 md:mt-auto w-full rounded-full cursor-pointer hover:brightness-90 duration-300">
-                    <p class="font-semibold">Cetak Struk Pembelian</p>
+              <div class="relative h-full mt-4">
+                <!-- Trigger button -->
+                <button @click.prevent="PrintOptions = !PrintOptions"
+                  class="absolute bottom-0 bg-primaryThin py-3 md:mt-auto w-full rounded-full cursor-pointer hover:brightness-90 duration-300">
+                  <p class="font-semibold">Cetak Struk Pembelian</p>
+                </button>
+
+                <!-- Modal Dropdown -->
+                <div v-if="PrintOptions"
+                  class="absolute mt-2 w-full left-0 bg-white rounded-2xl shadow-lg z-10 p-4 space-y-2">
+
+                  <button @click="cetakStruk"
+                    class="bg-primaryThin py-2 w-full rounded-full hover:brightness-90 duration-300">
+                    <p class="font-semibold">Cetak dengan mesin kasir</p>
                   </button>
 
-                  <!-- Modal Dropdown -->
-                  <div v-if="PrintOptions"
-                    class="absolute mt-2 w-full left-0 bg-white rounded-2xl shadow-lg z-10 p-4 space-y-2">
+                  <button @click="print_with_document_print"
+                    class="bg-primaryThin py-2 w-full rounded-full hover:brightness-90 duration-300">
+                    <p class="font-semibold">Cetak dengan printer/PDF</p>
+                  </button>
 
-                    <button @click="cetakStruk"
-                      class="bg-primaryThin py-2 w-full rounded-full hover:brightness-90 duration-300">
-                      <p class="font-semibold">Cetak dengan mesin kasir</p>
-                    </button>
-
-                    <button @click="print_with_document_print"
-                      class="bg-primaryThin py-2 w-full rounded-full hover:brightness-90 duration-300">
-                      <p class="font-semibold">Cetak dengan printer/PDF</p>
-                    </button>
-
-                  </div>
                 </div>
+              </div>
 
 
 
