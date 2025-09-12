@@ -102,26 +102,40 @@ const print = async () => {
     error.value = 'Printer not connected';
     return;
   }
+
   const encoder = new TextEncoder();
   let data = text.value + '\r\n\r\n\r\n';
 
   if (bold.value) data = '\x1b\x45\x01' + data + '\x1b\x45\x00';
 
   const textBuffer = encoder.encode(data);
-  const cutBuffer = new Uint8Array([0x1D, 0x56, 0x01]);
+  const cutBuffer = new Uint8Array([0x1D, 0x56, 0x01]); // ESC/POS cut command
   const combinedBuffer = new Uint8Array(textBuffer.length + cutBuffer.length);
 
   combinedBuffer.set(textBuffer, 0);
   combinedBuffer.set(cutBuffer, textBuffer.length);
 
   try {
-    const chunkSize = 128; // or even 20 if still failing
+    // 🔎 Detect platform (Android has smaller MTU)
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroid = userAgent.includes('android');
+
+    // Use small chunks on Android, larger on PC
+    const chunkSize = isAndroid ? 20 : 512;
+
     for (let i = 0; i < combinedBuffer.length; i += chunkSize) {
       const chunk = combinedBuffer.slice(i, i + chunkSize);
-      await characteristic.value.writeValueWithoutResponse(chunk); // faster, safer for Android
-      await new Promise(resolve => setTimeout(resolve, 50)); // give printer time
-    }
 
+      // Prefer writeValueWithoutResponse if available
+      if (characteristic.value.writeValueWithoutResponse) {
+        await characteristic.value.writeValueWithoutResponse(chunk);
+      } else {
+        await characteristic.value.writeValue(chunk);
+      }
+
+      // Give printer a bit more time on Android
+      await new Promise(resolve => setTimeout(resolve, isAndroid ? 50 : 20));
+    }
 
     console.log('✅ Printed and cut successfully');
   } catch (err) {
@@ -129,6 +143,7 @@ const print = async () => {
     error.value = err.message || 'Print failed';
   }
 };
+
 
 const cetakStruk = async () => {
   if (!connected.value) {
@@ -377,7 +392,7 @@ onBeforeUnmount(() => {
                   Total:
                   <span class="font-bold">Rp{{
                     Number(ORDER.total_amount).toLocaleString('id-ID')
-                  }}</span>
+                    }}</span>
                 </p>
               </div>
 
