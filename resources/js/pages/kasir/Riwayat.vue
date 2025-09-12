@@ -154,7 +154,7 @@ const cetakStruk = async () => {
     `Tanggal   : ${(ORDER.value?.created_at && new Date(ORDER.value.created_at).toLocaleString('id-ID')) || '-'}\n` +
     // `Kasir     : ${ORDER.value?.cashier_name || 'N/A'}\n` +
     `Transaksi : ${ORDER.value?.transaction_code || '-'}\n` +
-    // `Pembeli   : ${ORDER.value?.customer_name || 'N/A'}\n` +
+    `Pembeli   : ${ORDER.value?.customer_name || 'N/A'}\n` +
     "------------------------------\n" +
     "Daftar Belanja:\n" +
     ORDER.value?.items?.map(item => {
