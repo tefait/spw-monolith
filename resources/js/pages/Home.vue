@@ -61,15 +61,15 @@ onUnmounted(() => {
     <section class="bg-primary py-6 px-4 space-y-7">
       <div class="relative flex items-center justify-between w-full">
         <div class="w-10"></div>
-
-        <h1 class="absolute w-80 left-1/2 transform -translate-x-1/2 text-lg font-semibold text-textDark text-center">
-          E-Commerce TEFA & SPW<br>
+        <h1 class="absolute w-80 leading-6 left-1/2 transform -translate-x-1/2 text-lg font-semibold text-textDark text-center">
+          SiPEKA<br>
+          Sistem Penjualan Karya Siswa<br>
           <b>SMKN 2 SUMEDANG</b>
         </h1>
 
         <div>
           <Link href="/keranjang" class="text-textDark text-2xl">
-            <i class="fi fi-rr-shopping-cart"></i>
+          <i class="fi fi-rr-shopping-cart"></i>
           </Link>
         </div>
       </div>
