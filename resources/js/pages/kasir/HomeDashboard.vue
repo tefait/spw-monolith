@@ -208,7 +208,7 @@ watch(checkoutForm, (value) => {
     <!-- Keranjang -->
     <section
       class="hidden md:flex fixed z-10 right-0 top-28 -translate-x-4 h-[calc(100vh-128px)] w-[28vw] bg-white rounded-3xl p-4 flex-col">
-      <div class="w-full h-full flex flex-col relative">
+      <div class="w-full h-svh flex flex-col relative">
         <h1 class="text-textDark text-lg font-semibold">Keranjang</h1>
 
         <!-- Konten scrollable -->
