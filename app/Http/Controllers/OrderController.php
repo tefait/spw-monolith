@@ -72,6 +72,7 @@ class OrderController extends Controller
                 'email' => $data['email'],
                 'payment_method' => $data['payment_method'],
                 'notes' => $data['notes'],
+                'cash_given' => $total,
                 'total_amount' => $total,
             ]);
 
@@ -142,6 +143,8 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:255',
             'payment_method' => 'required|in:qris,cash',
             'carts' => 'nullable|array',
+            'change' => 'nullable|max:255',
+            'cash_given' => 'nullable|max:255',
             'source' => 'nullable|string',
         ]);
         if (Str::startsWith($data['whatsapp_number'], '08')) {
@@ -164,6 +167,14 @@ class OrderController extends Controller
         }
 
         $total = $carts->sum(fn($cart) => $cart->item->price * $cart->amount);
+        $cash = [
+            'given' => $total,
+            'change' => 0,
+        ];
+        if ($data['payment_method'] === 'cash' && !(empty($data['cash_given']) || empty($data['change']))) {
+            $cash['given'] = $data['cash_given'];
+            $cash['change'] = $data['change'];
+        }
 
         DB::beginTransaction();
         try {
@@ -172,6 +183,8 @@ class OrderController extends Controller
                 'transaction_code' => 'SPW' . now()->format('Ymd') . '-' . random_int(100000, 999999),
                 'customer_name' => $data['customer_name'],
                 'user_has_account' => Auth::check(),
+                'cash_given' => $cash['given'],
+                'change' => $cash['change'],
                 'whatsapp_number' => $data['whatsapp_number'],
                 'email' => $data['email'],
                 'status' => 'done',

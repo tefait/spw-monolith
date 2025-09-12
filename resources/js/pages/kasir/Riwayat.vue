@@ -384,6 +384,17 @@ onBeforeUnmount(() => {
                       {{ ORDER.payment_method }}
                     </p>
                   </div>
+                    <div v-if="ORDER.payment_method === 'cash'" class="flex justify-between">
+                      <p class="text-textDark">Tunai dan Kembali</p>
+                      <p class="text-textDark">
+                        {{
+                          "Rp. " +
+                          Number(ORDER.cash_given ?? ORDER.total_amount).toLocaleString('id-ID')
+                          + "  (Kembali Rp. " +
+                          Number(ORDER.change ?? 0).toLocaleString('id-ID')
+                          + ")" }}
+                      </p>
+                    </div>
                 </div>
               </div>
 
