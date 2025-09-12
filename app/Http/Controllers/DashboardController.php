@@ -267,7 +267,7 @@ class DashboardController extends Controller
     {
         $search = $request->input('search');
 
-        $itemsQuery = Item::query();
+        $itemsQuery = Item::where('stock', '>=', 1)->where('status', true)->query();
 
         if ($search) {
             $itemsQuery->where('name', 'like', '%' . $search . '%');
