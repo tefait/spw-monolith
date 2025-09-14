@@ -267,13 +267,13 @@ class DashboardController extends Controller
     {
         $search = $request->input('search');
 
-        $itemsQuery = Item::where('stock', '>=', 1)->where('status', true)->query();
+        $itemsQuery = Item::query();
 
         if ($search) {
             $itemsQuery->where('name', 'like', '%' . $search . '%');
         }
 
-        $items = $itemsQuery->latest()->get();
+        $items = $itemsQuery->where('stock', '>=', 1)->where('status', true)->latest()->get();
         $carts = auth()->user()->carts->load('item');
         return Inertia::render('kasir/HomeDashboard', [
             'items' => $items,

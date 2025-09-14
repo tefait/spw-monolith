@@ -61,7 +61,8 @@ onUnmounted(() => {
     <section class="bg-primary py-6 px-4 space-y-7">
       <div class="relative flex items-center justify-between w-full">
         <div class="w-10"></div>
-        <h1 class="absolute w-80 leading-6 left-1/2 transform -translate-x-1/2 text-lg font-semibold text-textDark text-center">
+        <h1
+          class="absolute w-80 leading-6 left-1/2 transform -translate-x-1/2 text-lg font-semibold text-textDark text-center">
           SiPEKA<br>
           Sistem Penjualan Karya Siswa<br>
           <b>SMKN 2 SUMEDANG</b>
@@ -138,7 +139,7 @@ onUnmounted(() => {
 
       <div class="grid grid-cols-2 gap-4 pb-20">
         <div v-for="product in products" :key="product.id"
-          class="flex flex-col bg-white p-3 rounded-2xl w-full max-w-[480px] h-[315px]">
+          class="flex flex-col bg-white p-3 rounded-2xl w-full cursor-pointer max-w-[480px] h-[315px]" @click="showOffcanvas(product)">
           <div class="h-[50%] w-full rounded-2xl overflow-hidden relative">
             <img :src="product.image" class="absolute top-0 left-0 w-full h-full object-cover" alt="" />
           </div>
@@ -152,8 +153,7 @@ onUnmounted(() => {
                 Sisa {{ product.stock }}
               </p>
             </div>
-            <button @click="showOffcanvas(product)"
-              class="bg-primary w-full py-2 rounded-full cursor-pointer hover:brightness-90 duration-300">
+            <button class="bg-primary cursor-pointer w-full py-2 rounded-full hover:brightness-90 duration-300">
               Beli
             </button>
           </div>

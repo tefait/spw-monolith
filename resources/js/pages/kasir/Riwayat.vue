@@ -144,6 +144,22 @@ const print = async () => {
   }
 };
 
+const cetakTeks = () => console.log("SPW Gridas\n\n\n\n" +
+  `Tanggal   : ${(ORDER.value?.created_at && new Date(ORDER.value.created_at).toLocaleString('id-ID')) || '-'}\n` +
+  // `Kasir     : ${ORDER.value?.cashier_name || 'N/A'}\n` +
+  `Transaksi : ${ORDER.value?.transaction_code || '-'}\n` +
+  `Pembeli   : ${ORDER.value?.customer_name || 'N/A'}\n` +
+  "------------------------------\n" +
+  "Daftar Belanja:\n" +
+  ORDER.value?.items?.map(item => {
+    const name = item.item.name.padEnd(10, ' ').slice(0, 20);
+    const qty = `x${item.quantity}`.padEnd(5, ' ');
+    const price = "\n" + formatCurrency(item.item.price).padStart(12, ' ');
+    return `${name}${qty}${price}`;
+  }).join('\n') + "\n" +
+  "------------------------------\n" +
+  `Total Bayar: ${formatCurrency(ORDER.value?.total_amount)}\n\n` +
+  "     -- Terima Kasih --\n");
 
 const cetakStruk = async () => {
   if (!connected.value) {
@@ -384,17 +400,17 @@ onBeforeUnmount(() => {
                       {{ ORDER.payment_method }}
                     </p>
                   </div>
-                    <div v-if="ORDER.payment_method === 'cash'" class="flex justify-between">
-                      <p class="text-textDark">Tunai dan Kembali</p>
-                      <p class="text-textDark">
-                        {{
-                          "Rp. " +
-                          Number(ORDER.cash_given ?? ORDER.total_amount).toLocaleString('id-ID')
-                          + "  (Kembali Rp. " +
-                          Number(ORDER.change ?? 0).toLocaleString('id-ID')
-                          + ")" }}
-                      </p>
-                    </div>
+                  <div v-if="ORDER.payment_method === 'cash'" class="flex justify-between">
+                    <p class="text-textDark">Tunai dan Kembali</p>
+                    <p class="text-textDark">
+                      {{
+                        "Rp. " +
+                        Number(ORDER.cash_given ?? ORDER.total_amount).toLocaleString('id-ID')
+                        + " (Kembali Rp. " +
+                        Number(ORDER.change ?? 0).toLocaleString('id-ID')
+                        + ")" }}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -463,7 +479,7 @@ onBeforeUnmount(() => {
                 <div v-if="PrintOptions"
                   class="absolute mt-2 w-full left-0 bg-white rounded-2xl shadow-lg z-10 p-4 space-y-2">
 
-                  <button @click="cetakStruk"
+                  <button @click="cetakStruk" @mouseover="cetakTeks"
                     class="bg-primaryThin py-2 w-full rounded-full hover:brightness-90 duration-300">
                     <p class="font-semibold">Cetak dengan mesin kasir</p>
                   </button>

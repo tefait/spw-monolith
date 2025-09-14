@@ -11,10 +11,11 @@ const page = usePage();
 // Refs
 const carts = ref([]);
 const menus = ref([...page.props.items]);
+const showModalCart = ref(false);
 const isDropdownOpen = ref(false);
 const dropdownRef = ref(null);
 const showModalCheckout = ref(false);
-const selectedMethod = ref(null);
+const selectedMethod = ref('cash');
 const showModalKeluar = ref(false);
 
 // Form
@@ -168,10 +169,15 @@ watch(checkoutForm, (value) => {
             </div>
           </div>
         </div>
-        <div class="mt-4 md:mt-0">
+        <!-- <div class="mt-4 md:mt-0">
           <button
             class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300">
             <p class="text-textDark font-medium">QR Code</p>
+          </button>
+        </div> -->
+        <div class="md:hidden mt-4">
+          <button @click="showModalCart = true" class="bg-primary px-4 py-2 rounded-full">
+            Keranjang ({{ carts.length }})
           </button>
         </div>
       </div>
@@ -205,14 +211,24 @@ watch(checkoutForm, (value) => {
       </div>
     </section>
 
+
+
+
     <!-- Keranjang -->
     <section
-      class="hidden md:flex fixed z-10 right-0 top-28 -translate-x-4 h-[calc(100vh-128px)] w-[28vw] bg-white rounded-3xl p-4 flex-col">
-      <div class="w-full h-svh flex flex-col relative">
-        <h1 class="text-textDark text-lg font-semibold">Keranjang</h1>
+      :class="showModalCart
+        ? 'fixed left-0 top-0 z-20 flex h-dvh w-dvw translate-x-0 rounded-none bg-white p-4 flex-col'
+        : 'hidden md:flex fixed z-10 right-0 top-28 -translate-x-4 h-[calc(100vh-128px)] w-[28vw] bg-white rounded-3xl p-4 flex-col'">
 
+      <div class="w-full h-svh flex flex-col relative">
+        <div class="flex justify-between">
+          <h1 class="text-textDark text-lg font-semibold">Keranjang</h1>
+          <p class="text-textDark text-2xl cursor-pointer" @click="showModalCart = false">
+            <i class="fi fi-rr-cross-small"></i>
+          </p>
+        </div>
         <!-- Konten scrollable -->
-        <div class="flex flex-col gap-4 mt-6 overflow-y-auto pr-1 max-h-[calc(100vh-330px)]">
+        <div class="flex flex-col gap-4 mt-6 overflow-y-auto pr-1 max-h-[calc(40vh)] lg:max-h-[calc(100vh-330px)]">
           <!-- Item Keranjang -->
           <div v-for="cart in carts" class="flex gap-4">
             <div class="w-[calc(50%-56px)] rounded-2xl overflow-hidden relative">
@@ -269,15 +285,17 @@ watch(checkoutForm, (value) => {
     </Transition>
 
     <Transition name="scale">
-      <div v-if="showModalCheckout"
-        class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 bg-bgGray w-[90%] py-8 px-6 rounded-4xl shadow-lg z-30">
+      <div v-if="showModalCheckout" class="fixed scale-100 bg-bgGray overflow-scroll lg:overflow-auto"
+        :class="showModalCart
+          ? 'left-0 top-0 z-20 flex h-svh w-svw translate-x-0 rounded-none p-4 flex-col'
+          : 'max-w-dvw max-h-dvh top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] py-8 px-6 rounded-4xl shadow-lg z-30'">
         <div class="flex justify-between">
           <h1 class="text-textDark text-lg font-semibold">Checkout</h1>
           <p class="text-textDark text-2xl cursor-pointer" @click="closeModalCheckout">
             <i class="fi fi-rr-cross-small"></i>
           </p>
         </div>
-        <div class="grid grid-cols-3 gap-8 mt-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
           <div class="col-span-1">
             <h1 class="text-textDark font-semibold">Data Pemesan</h1>
             <div class="space-y-4 mt-4">
