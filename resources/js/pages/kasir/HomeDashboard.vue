@@ -223,7 +223,7 @@ watch(checkoutForm, (value) => {
       <div class="w-full h-svh flex flex-col relative">
         <div class="flex justify-between">
           <h1 class="text-textDark text-lg font-semibold">Keranjang</h1>
-          <p class="text-textDark text-2xl cursor-pointer" @click="showModalCart = false">
+          <p v-if="showModalCart" class="text-textDark text-2xl cursor-pointer" @click="showModalCart = false">
             <i class="fi fi-rr-cross-small"></i>
           </p>
         </div>
