@@ -58,7 +58,7 @@ onUnmounted(() => {
     <Head title="Beranda" />
 
     <!-- Hero Section -->
-    <section class="bg-primary py-6 px-4 space-y-7">
+    <!-- <section class="bg-primary py-6 px-4 space-y-7">
       <div class="relative flex items-center justify-between w-full">
         <div class="w-10"></div>
         <h1
@@ -84,14 +84,49 @@ onUnmounted(() => {
           <i class="fi fi-rr-search text-textDark text-xl"></i>
         </div>
       </div>
+    </section> -->
+
+    <!-- Banner -->
+    <!-- <section>
+      <img src="/assets/images/SPANDUK SPW SECONDARY.webp" alt="SPANDUK SPW" />
+    </section> -->
+
+
+    <!-- Hero Section -->
+    <section class="py-6 px-4 space-y-5">
+      <div class="flex justify-around items-center">
+        <div class="w-1/4"></div>
+        <div class="w-2/4">
+          <h1 class="leading-6 text-base font-semibold text-textDark text-center">
+            <span class="font-bold text-xl">SiPEKA</span><br>
+            <span class="font-normal">Sistem Penjualan Karya Siswa</span><br>
+            <b>SMKN 2 SUMEDANG</b>
+          </h1>
+        </div>
+        <!-- <img src="/assets/images/logo.png" alt="Logo ASoleh" class="w-18 h-18"> -->
+        <div class="w-1/4 flex justify-end items-center">
+          <Link href="/keranjang" class="text-textDark bg-primaryThin px-3 py-2.5 rounded-xl text-2xl">
+          <p class="translate-y-0.5"><i class="fi fi-rr-shopping-cart"></i></p>
+          </Link>
+        </div>
+      </div>
     </section>
 
     <!-- Banner -->
-    <section>
-      <img src="/assets/images/SPANDUK SPW SECONDARY.webp" alt="SPANDUK SPW" />
+    <section class="px-4">
+      <img src="/assets/images/SPANDUK SPW SECONDARY.webp" alt="BANNER ASOLEH" class="rounded-2xl" />
     </section>
 
-    <section class="bg-bgGray py-5 px-4 rounded-t-4xl -translate-y-7 space-y-4">
+    <div class="relative mt-4 px-4">
+      <input v-model="search" type="search"
+        class="peer py-3 px-4 ps-14 block w-full bg-white rounded-2xl focus:outline-none shadow-lg"
+        placeholder="Cari produk" />
+      <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-8 pt-1">
+        <i class="fi fi-rr-search text-textDark text-xl"></i>
+      </div>
+    </div>
+
+    <section class="bg-bgGray py-5 px-4 rounded-t-4xl space-y-4">
       <!-- Category -->
       <h1 class="text-textDark text-lg font-bold mb-2">Kategori</h1>
       <div class="overflow-x-auto flex gap-3 pb-4 scroll-smooth">
@@ -139,7 +174,8 @@ onUnmounted(() => {
 
       <div class="grid grid-cols-2 gap-4 pb-20">
         <div v-for="product in products" :key="product.id"
-          class="flex flex-col bg-white p-3 rounded-2xl w-full cursor-pointer max-w-[480px] h-[315px]" @click="showOffcanvas(product)">
+          class="flex flex-col bg-white p-3 rounded-2xl w-full cursor-pointer max-w-[480px] h-[315px]"
+          @click="showOffcanvas(product)">
           <div class="h-[50%] w-full rounded-2xl overflow-hidden relative">
             <img :src="product.image" class="absolute top-0 left-0 w-full h-full object-cover" alt="" />
           </div>
