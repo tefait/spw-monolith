@@ -5,19 +5,27 @@ import HeaderDashboard from '@/components/HeaderDashboard.vue';
 import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { push } from 'notivue';
 import { router as louter } from '@inertiajs/core';
+import { konversiStatus, printWithDocumentPrint } from '../../lib/utils';
 // Page
 const page = usePage();
 
 // Refs
 const carts = ref([]);
 const menus = ref([...page.props.items]);
-const showModalCart = ref(false);
+const successModal = ref(false);
+const cartModal = ref(false);
+const PrintOptions = ref(false);
+const previewImage = ref(false);
 const isDropdownOpen = ref(false);
 const dropdownRef = ref(null);
 const showModalCheckout = ref(false);
 const selectedMethod = ref('cash');
 const showModalKeluar = ref(false);
 
+
+const print_with_document_print = () => {
+  printWithDocumentPrint(page.props.flash.success.order, push)
+}
 // Form
 const checkoutForm = useForm({
   customer_name: '',
@@ -105,14 +113,137 @@ const SubmitCart = () => {
       console.error(errors);
       push.error('Gagal Membuat Pesanan, Silahkan Periksa Kembali Data Anda');
     },
-    onSuccess: () => {
-      push.success({
-        message: 'Pesanan berhasil ditambahkan, Anda akan dialihkan ke halaman riwayat untuk mencetak struk',
-        duration: 1750,
-      });
-      louter.visit('/kasir/riwayat')
+    onSuccess: (event) => {
+      console.log(event);
+      if (event.props.flash?.success?.success) {
+        push.success({
+          message: 'Pesanan berhasil ditambahkan, Anda akan dialihkan ke halaman riwayat untuk mencetak struk',
+          duration: 1750,
+        });
+        showModalCheckout.value = false;
+        cartModal.value = false;
+        successModal.value = true;
+      }
     }
   });
+};
+
+// Refs: Bluetooth connection, Printer, and error handling
+const error = ref('');
+const text = ref('');
+const bold = ref(false);
+const device = ref(null);
+const characteristic = ref(null);
+const connected = ref(false);
+// Bluetooth connection methods
+const ensureConnected = async () => {
+  if (device.value?.gatt && !device.value?.gatt?.connected) {
+    try {
+      const server = await device.value.gatt.connect();
+      const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+      characteristic.value = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+      connected.value = true;
+      console.log('🔄 Reconnected to printer');
+    } catch (err) {
+      push.error({ title: '❌ Bluetooth failed', message: err })
+      console.error('❌ Reconnection failed:', err);
+      error.value = 'Failed to reconnect';
+      return false;
+    }
+  }
+  return true;
+};
+
+const connectPrinter = async () => {
+  error.value = '';
+  try {
+    const dev = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'],
+    });
+    device.value = dev;
+
+    const server = await dev.gatt.connect();
+    const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+    characteristic.value = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+
+    connected.value = true;
+    console.log('✅ Connected to printer');
+  } catch (err) {
+    push.error({ title: '❌ Bluetooth ERROR', message: err })
+    console.error(err);
+    error.value = err.message || 'Failed to connect';
+  }
+};
+import { formatCurrency } from '../../lib/utils';
+// Print methods
+const print = async () => {
+  if (!await ensureConnected()) return;
+  if (!characteristic.value) {
+    error.value = 'Printer not connected';
+    return;
+  }
+
+  const encoder = new TextEncoder();
+  let data = text.value + '\r\n\r\n\r\n';
+
+  if (bold.value) data = '\x1b\x45\x01' + data + '\x1b\x45\x00';
+
+  const textBuffer = encoder.encode(data);
+  const cutBuffer = new Uint8Array([0x1D, 0x56, 0x01]); // ESC/POS cut command
+  const combinedBuffer = new Uint8Array(textBuffer.length + cutBuffer.length);
+
+  combinedBuffer.set(textBuffer, 0);
+  combinedBuffer.set(cutBuffer, textBuffer.length);
+
+  try {
+    const chunkSize = 20;
+
+    for (let i = 0; i < combinedBuffer.length; i += chunkSize) {
+      const chunk = combinedBuffer.slice(i, i + chunkSize);
+
+      // Prefer writeValueWithoutResponse if available
+      if (characteristic.value.writeValueWithoutResponse) {
+        await characteristic.value.writeValueWithoutResponse(chunk);
+      } else {
+        await characteristic.value.writeValue(chunk);
+      }
+
+      // Give printer a bit more time on Android
+      await new Promise(resolve => setTimeout(resolve, isAndroid ? 50 : 20));
+    }
+
+    console.log('✅ Printed and cut successfully');
+  } catch (err) {
+    console.error(err);
+    error.value = err.message || 'Print failed';
+  }
+};
+const cetakStruk = async () => {
+  if (!connected.value) {
+    await connectPrinter();
+  }
+  text.value =
+    "SPW Gridas\n\n\n\n" +
+    `Tanggal   : ${(page.props.flash.success.order?.created_at && new Date(page.props.flash.success.order.created_at).toLocaleString('id-ID')) || '-'}\n` +
+    // `Kasir     : ${page.props.flash.success.order?.cashier_name || 'N/A'}\n` +
+    `Transaksi : ${page.props.flash.success.order?.transaction_code || '-'}\n` +
+    `Pembeli   : ${page.props.flash.success.order?.customer_name || 'N/A'}\n` +
+    "------------------------------\n" +
+    "Daftar Belanja:\n" +
+    page.props.flash.success.order?.items?.map(item => {
+      const name = item.item.name.padEnd(10, ' ').slice(0, 20);
+      const qty = `x${item.quantity}`.padEnd(5, ' ');
+      const price = "\n" + formatCurrency(item.item.price).padStart(12, ' ');
+      return `${name}${qty}${price}`;
+    }).join('\n') + "\n" +
+    "------------------------------\n" +
+    `Total Bayar: ${formatCurrency(page.props.flash.success.order?.total_amount)}\n\n` +
+    "     -- Terima Kasih --\n";
+
+  console.log('🔄 Printing...');
+  console.log(text.value);
+  await print();
 };
 
 // Modal helper
@@ -176,7 +307,7 @@ watch(checkoutForm, (value) => {
           </button>
         </div> -->
         <div class="md:hidden mt-4">
-          <button @click="showModalCart = true" class="bg-primary px-4 py-2 rounded-full">
+          <button @click="cartModal = true" class="bg-primary px-4 py-2 rounded-full">
             Keranjang ({{ carts.length }})
           </button>
         </div>
@@ -214,16 +345,183 @@ watch(checkoutForm, (value) => {
 
 
 
+    <!-- Success Modal -->
+    <Transition name="fade">
+      <div v-if="successModal" class="fixed inset-0 bg-black/50 z-20" @click="successModal = !successModal"></div>
+    </Transition>
+
+    <Transition name="scale">
+      <div v-if="successModal" class="fixed inset-0 z-30 flex items-center justify-center px-4">
+        <div class="bg-bgGray w-full md:w-[60%] max-h-[90vh] md:max-h-screen overflow-y-auto rounded-4xl shadow-lg p-6"
+          @click.stop>
+          <div class="flex justify-between">
+            <h1 class="text-textDark text-lg font-semibold">
+              Berhasil, Detail Pesanan:
+            </h1>
+            <p class="text-textDark text-2xl cursor-pointer" @click="successModal = !successModal">
+              <i class="fi fi-rr-cross-small"></i>
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <!-- Kolom Kiri -->
+            <div class="col-span-1">
+              <h1 class="text-textDark font-semibold">Data Pemesan</h1>
+              <div class="space-y-4 mt-4">
+                <div>
+                  <label class="text-textDark">Nama Pemesan</label>
+                  <div class="relative mt-2">
+                    <div class="py-3 px-4 ps-12 bg-white rounded-full">
+                      <p class="text-textDark">
+                        {{ $page.props.flash.success.order.customer_name || 'N/A' }}
+                      </p>
+                    </div>
+                    <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
+                      <p class="text-textDark text-xl">
+                        <i class="fi fi-rr-user"></i>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label class="text-textDark">Nomor WhatsApp</label>
+                  <div class="relative mt-2">
+                    <div class="py-3 px-4 ps-12 bg-white rounded-full">
+                      <p class="text-textDark">
+                        {{ $page.props.flash.success.order.whatsapp_number || 'N/A' }}
+                      </p>
+                    </div>
+                    <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
+                      <p class="text-textDark text-xl">
+                        <i class="fi fi-brands-whatsapp"></i>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <div class="bg-white mt-4 p-4 rounded-2xl space-y-2">
+                  <div class="flex justify-between">
+                    <p class="text-textDark">Kode Transaksi</p>
+                    <p class="text-textDark font-semibold">
+                      {{ $page.props.flash.success.order.transaction_code }}
+                    </p>
+                  </div>
+                  <div class="flex justify-between">
+                    <p class="text-textDark">Waktu Pemesanan</p>
+                    <p class="text-textDark">
+                      {{ new Date($page.props.flash.success.order.created_at).toLocaleString('id-ID') }}
+                    </p>
+                  </div>
+                  <div class="flex justify-between">
+                    <p class="text-textDark">Status</p>
+                    <p class="text-green">{{ konversiStatus($page.props.flash.success.order.status) }}</p>
+                  </div>
+                  <div class="flex justify-between">
+                    <p class="text-textDark">Metode Pembayaran</p>
+                    <p class="text-textDark uppercase">
+                      {{ $page.props.flash.success.order.payment_method }}
+                    </p>
+                  </div>
+                  <div v-if="$page.props.flash.success.order.payment_method === 'cash'" class="flex justify-between">
+                    <p class="text-textDark">Tunai dan Kembali</p>
+                    <p class="text-textDark">
+                      {{ "Rp. " + Number($page.props.flash.success.order.cash_given ??
+                        $page.props.flash.success.order.total_amount).toLocaleString('id-ID') + " (Kembali Rp. "
+                        + Number($page.props.flash.success.order.change ?? 0).toLocaleString('id-ID') + ")" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-between mt-6">
+                <p class="text-textDark">
+                  Total:
+                  <span class="font-bold">Rp{{
+                    Number($page.props.flash.success.order.total_amount).toLocaleString('id-ID')
+                    }}</span>
+                </p>
+              </div>
+
+              <button v-if="$page.props.flash.success.order.payment?.proof" @click="previewImage = true"
+                class="bg-primary py-3 mt-4 w-full rounded-full cursor-pointer hover:brightness-90 duration-300">
+                <p class="font-semibold">Lihat Bukti Pembayaran</p>
+              </button>
+            </div>
+
+            <!-- Bukti pembayaran modal -->
+            <Transition name="scale">
+              <div class="absolute top-0 left-0 w-full h-full bg-black/25 z-10 flex items-center justify-center"
+                v-if="previewImage && $page.props.flash.success.order.payment?.proof" @click="previewImage = false">
+                <img :src="`/storage/${$page.props.flash.success.order.payment.proof}`" class="w-[80vh]"
+                  alt="Bukti pembayaran" @click.stop />
+              </div>
+            </Transition>
+            <!-- Kolom Kanan -->
+            <div class="col-span-1 flex flex-col h-full">
+              <h1 class="text-textDark font-semibold">Detail Pesanan</h1>
+              <div class="flex flex-col gap-4 mt-4 bg-white p-4 rounded-2xl max-h-[274px] overflow-y-auto">
+                <div v-for="i in $page.props.flash.success.order.items" class="flex justify-between items-center">
+                  <div>
+                    <h1 class="line-clamp-1">{{ i.item.name }}</h1>
+                    <h2 class="font-bold">
+                      Rp{{ Number(i.item.price).toLocaleString('id-ID') }}
+                    </h2>
+                  </div>
+                  <p class="text-xs text-textDark mt-1">x{{ i.quantity }}</p>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <label class="text-textDark">Catatan</label>
+                <div class="relative mt-2">
+                  <div class="py-3 px-4 ps-12 bg-white rounded-full">
+                    <p class="text-textDark">{{ $page.props.flash.success.order.notes || 'N/A' }}</p>
+                  </div>
+                  <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
+                    <p class="text-textDark text-xl">
+                      <i class="fi fi-rr-edit"></i>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="relative h-full mt-4">
+                <!-- Trigger button -->
+                <button @click.prevent="PrintOptions = !PrintOptions"
+                  class="absolute bottom-0 bg-primaryThin py-3 md:mt-auto w-full rounded-full cursor-pointer hover:brightness-90 duration-300">
+                  <p class="font-semibold">Cetak Struk Pembelian</p>
+                </button>
+
+                <!-- Modal Dropdown -->
+                <div v-if="PrintOptions"
+                  class="absolute mt-2 w-full left-0 bg-white rounded-2xl shadow-lg z-10 p-4 space-y-2">
+                  <button @click="cetakStruk"
+                    class="bg-primaryThin py-2 w-full rounded-full hover:brightness-90 duration-300">
+                    <p class="font-semibold">Cetak dengan mesin kasir</p>
+                  </button>
+
+                  <button @click="print_with_document_print"
+                    class="bg-primaryThin py-2 w-full rounded-full hover:brightness-90 duration-300">
+                    <p class="font-semibold">Cetak dengan printer/PDF</p>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
     <!-- Keranjang -->
     <section
-      :class="showModalCart
+      :class="cartModal
         ? 'fixed left-0 top-0 z-20 flex h-dvh w-dvw translate-x-0 rounded-none bg-white p-4 flex-col'
         : 'hidden md:flex fixed z-10 right-0 top-28 -translate-x-4 h-[calc(100vh-128px)] w-[28vw] bg-white rounded-3xl p-4 flex-col'">
 
       <div class="w-full h-svh flex flex-col relative">
         <div class="flex justify-between">
           <h1 class="text-textDark text-lg font-semibold">Keranjang</h1>
-          <p v-if="showModalCart" class="text-textDark text-2xl cursor-pointer" @click="showModalCart = false">
+          <p v-if="cartModal" class="text-textDark text-2xl cursor-pointer" @click="cartModal = false">
             <i class="fi fi-rr-cross-small"></i>
           </p>
         </div>
@@ -286,7 +584,7 @@ watch(checkoutForm, (value) => {
 
     <Transition name="scale">
       <div v-if="showModalCheckout" class="fixed scale-100 bg-bgGray overflow-scroll lg:overflow-auto"
-        :class="showModalCart
+        :class="cartModal
           ? 'left-0 top-0 z-20 flex h-svh w-svw translate-x-0 rounded-none p-4 flex-col'
           : 'max-w-dvw max-h-dvh top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] py-8 px-6 rounded-4xl shadow-lg z-30'">
         <div class="flex justify-between">

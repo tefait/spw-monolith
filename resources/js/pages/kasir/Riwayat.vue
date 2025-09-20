@@ -15,29 +15,17 @@ const PrintOptions = ref(false)
 // Refs: Order details
 const ORDER = ref({});
 const previewImage = ref(false);
-// Refs: Bluetooth connection, Printer, and error handling
-const error = ref('');
-const text = ref('');
-const bold = ref(false);
-const device = ref(null);
-const characteristic = ref(null);
-const connected = ref(false);
+
+import { formatCurrency } from '../../lib/utils';
+import { printWithDocumentPrint } from '../../lib/utils';
 
 
-// Helper methods
-const formatCurrency = (num) => `Rp${Number(num).toLocaleString('id-ID')}`;
-
-// Modal and Dropdown methods
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
 const handleClickOutside = (event) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
     isDropdownOpen.value = false;
 
   }
 };
-
 const openModalDetail = (order) => {
   showModalDetail.value = true;
   ORDER.value = order;
@@ -54,6 +42,13 @@ const closeModalKeluar = () => {
   showModalKeluar.value = false;
 };
 
+// Refs: Bluetooth connection, Printer, and error handling
+const error = ref('');
+const text = ref('');
+const bold = ref(false);
+const device = ref(null);
+const characteristic = ref(null);
+const connected = ref(false);
 // Bluetooth connection methods
 const ensureConnected = async () => {
   if (device.value?.gatt && !device.value?.gatt?.connected) {
@@ -116,12 +111,7 @@ const print = async () => {
   combinedBuffer.set(cutBuffer, textBuffer.length);
 
   try {
-    // 🔎 Detect platform (Android has smaller MTU)
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isAndroid = userAgent.includes('android');
-
-    // Use small chunks on Android, larger on PC
-    const chunkSize = isAndroid ? 20 : 512;
+    const chunkSize = 20;
 
     for (let i = 0; i < combinedBuffer.length; i += chunkSize) {
       const chunk = combinedBuffer.slice(i, i + chunkSize);
@@ -143,24 +133,6 @@ const print = async () => {
     error.value = err.message || 'Print failed';
   }
 };
-
-const cetakTeks = () => console.log("SPW Gridas\n\n\n\n" +
-  `Tanggal   : ${(ORDER.value?.created_at && new Date(ORDER.value.created_at).toLocaleString('id-ID')) || '-'}\n` +
-  // `Kasir     : ${ORDER.value?.cashier_name || 'N/A'}\n` +
-  `Transaksi : ${ORDER.value?.transaction_code || '-'}\n` +
-  `Pembeli   : ${ORDER.value?.customer_name || 'N/A'}\n` +
-  "------------------------------\n" +
-  "Daftar Belanja:\n" +
-  ORDER.value?.items?.map(item => {
-    const name = item.item.name.padEnd(10, ' ').slice(0, 20);
-    const qty = `x${item.quantity}`.padEnd(5, ' ');
-    const price = "\n" + formatCurrency(item.item.price).padStart(12, ' ');
-    return `${name}${qty}${price}`;
-  }).join('\n') + "\n" +
-  "------------------------------\n" +
-  `Total Bayar: ${formatCurrency(ORDER.value?.total_amount)}\n\n` +
-  "     -- Terima Kasih --\n");
-
 const cetakStruk = async () => {
   if (!connected.value) {
     await connectPrinter();
@@ -174,9 +146,9 @@ const cetakStruk = async () => {
     "------------------------------\n" +
     "Daftar Belanja:\n" +
     ORDER.value?.items?.map(item => {
-      const name = item.item.name.padEnd(20, ' ').slice(0, 20);
+      const name = item.item.name.padEnd(10, ' ').slice(0, 20);
       const qty = `x${item.quantity}`.padEnd(5, ' ');
-      const price = formatCurrency(item.item.price).padStart(12, ' ');
+      const price = "\n" + formatCurrency(item.item.price).padStart(12, ' ');
       return `${name}${qty}${price}`;
     }).join('\n') + "\n" +
     "------------------------------\n" +
@@ -187,67 +159,9 @@ const cetakStruk = async () => {
   console.log(text.value);
   await print();
 };
-
 const print_with_document_print = () => {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    push.error({ title: '❌ Error', message: 'Pop-up blocked. Please allow pop-ups for this site.' });
-    return;
-  }
-
-
-  const htmlContent = `
-    <html>
-      <head>
-        <title>Struk Pembelian</title>
-        <style>
-          body {
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre;
-            padding: 20px;
-          }
-          .center {
-            text-align: center;
-          }
-          .bold {
-            font-weight: bold;
-          }
-          .separator {
-            border-top: 1px dashed #000;
-            margin: 10px 0;
-          }
-        </style>
-      </head>
-      <body onload="window.print(); window.close();">
-        <div class="center bold">SPW Gridas</div>
-
-        <br>
-        Tanggal     : ${ORDER.value.created_at || '-'}
-        Transaksi   : ${ORDER.value.transaction_code || '-'}
-
-        <div class="separator"></div>
-        <div class="bold">Daftar Belanja:</div>
-
-${ORDER.value.items.map(item => {
-    const name = item.item.name.padEnd(20, ' ').slice(0, 20);
-    const qty = `x${item.quantity}`.padEnd(5, ' ');
-    const price = formatCurrency(item.item.price).padStart(12, ' ');
-    return `${name} ${qty} ${price}`;
-  }).join('\n')}
-
-        <div class="separator"></div>
-        Total Bayar : ${formatCurrency(ORDER.value.total_amount)}
-        <br><br>
-        <div class="center">-- Terima Kasih --</div>
-      </body>
-    </html>
-  `;
-
-  printWindow.document.open();
-  printWindow.document.write(htmlContent);
-  printWindow.document.close();
-};
+  printWithDocumentPrint(ORDER.value, push)
+}
 
 // Hooks
 onMounted(() => {
@@ -479,7 +393,7 @@ onBeforeUnmount(() => {
                 <div v-if="PrintOptions"
                   class="absolute mt-2 w-full left-0 bg-white rounded-2xl shadow-lg z-10 p-4 space-y-2">
 
-                  <button @click="cetakStruk" @mouseover="cetakTeks"
+                  <button @click="cetakStruk"
                     class="bg-primaryThin py-2 w-full rounded-full hover:brightness-90 duration-300">
                     <p class="font-semibold">Cetak dengan mesin kasir</p>
                   </button>

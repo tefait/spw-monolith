@@ -214,13 +214,13 @@ class OrderController extends Controller
             }
 
             DB::commit();
-            return redirect('kasir/riwayat')->with(['success' => 'Pesanan berhasil ditambahkan, silahkan lanjut dihalaman pesanan.']);
-            event(new NewOrderCreated($order->load('items.item', 'payment')));
-            // return redirect()->back()->with('Berhasil', [
-            //     'success' => true,
-            //     'order' => $order,
-            //     'total' => $total,
-            // ]);
+            // return redirect('kasir/riwayat')->with(['success' => 'Pesanan berhasil ditambahkan, silahkan lanjut dihalaman pesanan.']);
+            // event(new NewOrderCreated($order->load('items.item', 'payment')));
+            return redirect()->back()->with('success', [
+                'success' => true,
+                'order' => $order->load('items.item'),
+                'total' => $total,
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
 
