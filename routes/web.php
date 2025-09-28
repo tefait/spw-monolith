@@ -199,8 +199,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/kasir/pengaturan', fn() => Inertia::render('kasir/Pengaturan'))->middleware('role:kasir,admin');
     Route::get('/kasir/berhasil', fn() => Inertia::render('kasir/Berhasil'))->middleware('role:kasir,admin');
     Route::post('/kasir/cart/add', [CartController::class, 'kasir_add_to_cart'])->name('kasir.keranjang.add')->middleware('role:kasir,admin');
-    Route::patch('/pesanan/{order}', [OrderController::class, 'updateOrderStatus'])->name('kasir.update_order_status')->middleware('role:kasir,admin');
-
+    Route::post('/pesanan/{order}', [OrderController::class, 'updateOrderStatus']);
 
     // Pelayan
     Route::get('/pelayan/dashboard', [DashboardController::class, 'render_menu'])->middleware('role:staff,admin');
@@ -248,7 +247,7 @@ Route::middleware('auth')->group(function () {
     Route::post('supplier/store', [SupplierController::class, 'store'])->name('store.supplier')->middleware('role:admin,staff');
     Route::put('supplier/update/{supplier}', [SupplierController::class, 'update'])->name('update.supplier')->middleware('role:admin,staff');
     Route::delete('supplier/delete/{supplier}', [SupplierController::class, 'destroy'])->name('delete.supplier')->middleware('role:admin,staff');
-    
+
     Route::delete('category/delete/{category}', [CategoryController::class, 'destroy'])->name('delete.category')->middleware('role:admin,staff');
     Route::post('category/store', [CategoryController::class, 'store'])->name('store.category')->middleware('role:admin,staff');
     Route::put('category/update/{category}', [CategoryController::class, 'update'])->name('update.category')->middleware('role:admin,staff');

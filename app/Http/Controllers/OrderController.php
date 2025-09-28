@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -284,15 +285,43 @@ class OrderController extends Controller
         );
         return back()->with('message', 'Bukti pembayaran berhasil diupload!');
     }
+
     public function updateOrderStatus(Request $request, Order $order)
     {
-        $request->validate([
+        $validated = $request->validate([
             'status' => 'required|in:paid,unpaid,under-review,rejected,done',
+            'cash_given' => 'nullable|numeric|min:0',
+            'change' => 'nullable|numeric|min:0',
+            'proof' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
         ]);
 
+        // Update the Order with cash details
         $order->update([
-            'status' => $request->status,
+            'status' => $validated['status'],
+            'cash_given' => $validated['cash_given'] ?? $order->cash_given,
+            'change' => $validated['change'] ?? $order->change,
         ]);
+
+        // Handle proof of payment upload
+        if ($request->hasFile('proof')) {
+            // Find the related payment record, or create it if it doesn't exist
+            $payment = $order->payment()->firstOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'payment_method' => $order->payment_method,
+                    'amount_paid' => $order->total_amount
+                ]
+            );
+
+            // Delete old proof if it exists
+            if ($payment->proof) {
+                Storage::disk('public')->delete($payment->proof);
+            }
+
+            // Store the new proof and update the record
+            $path = $request->file('proof')->store('proofs', 'public');
+            $payment->update(['proof' => $path]);
+        }
 
         return redirect()->back()->with('message', 'Status transaksi berhasil diperbarui!');
     }
