@@ -26,7 +26,6 @@ return new class extends Migration
             $table->unsignedInteger('total_amount');
             $table->unsignedInteger('cash_given')->nullable();
             $table->unsignedInteger('change')->nullable();
-            
             $table->softDeletes();
             $table->timestamps();
         });

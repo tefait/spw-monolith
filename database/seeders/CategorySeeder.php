@@ -15,7 +15,7 @@ class CategorySeeder extends Seeder
         Category::create([
             'name' => 'Main Course',
             'slug' => 'main-course',
-            'image' => 'https://example.com/food.webp',
+            'image' => '/assets/images/makanan.png',
             'status' => true,
         ]);
     }

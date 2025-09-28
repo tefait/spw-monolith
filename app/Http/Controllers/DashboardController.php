@@ -82,12 +82,12 @@ class DashboardController extends Controller
             'suppliers' => Supplier::all()
         ]);
     }
+
     public function render_report_page(Request $request)
     {
-        // === Tentukan rentang tanggal berdasar period ===
         $start = null;
         $end   = null;
-        $bucket = null; // 'hour' atau 'day' (untuk chart)
+        $bucket = null;
 
         if ($request->filled('period')) {
             switch ($request->period) {
@@ -107,45 +107,64 @@ class DashboardController extends Controller
                     if ($request->filled(['start', 'end'])) {
                         $start = Carbon::parse($request->start)->startOfDay();
                         $end   = Carbon::parse($request->end)->endOfDay();
-                        // kalau start=end → tampilkan per jam, selain itu per hari
                         $bucket = $start->isSameDay($end) ? 'hour' : 'day';
                     }
                     break;
             }
         }
 
-        // === Query utama untuk tabel ===
         $query = Order::query()->with('user');
         if ($start && $end) {
             $query->whereBetween('created_at', [$start, $end]);
         }
         $orders = $query->with('items.item')->get();
-
-        // === Stats global yang tidak terkait period (tetap) ===
         $activeItemCount = Item::where('stock', '>', 0)->count();
         $supplierCount   = Supplier::count();
         $customerCount   = User::where('role', 'customer')->count();
-
-        // === Stats yang mengikuti period: orders count, income, profit ===
         $ordersInPeriod = Order::when($start && $end, fn($q) => $q->whereBetween('created_at', [$start, $end]))->count();
-
-        // Ambil item order dalam period yang statusnya selesai/dibayar
         $orderItems = Order::when($start && $end, fn($q) => $q->whereBetween('created_at', [$start, $end]))
             ->whereIn('status', ['paid', 'done'])
-            ->with(['items:id,order_id,price,quantity,supplier_price'])
-            ->get()
+            ->with(['items.item.supplier:id,name'])->get()
             ->flatMap->items;
 
         $income = $orderItems->sum(fn($i) => (float) $i->price * (int) $i->quantity);
         $profit = $orderItems->sum(fn($i) => ((float) $i->price - (float) ($i->supplier_price ?? 0)) * (int) $i->quantity);
+        $salesBySupplier = $orderItems
+            ->filter(fn($orderItem) => $orderItem->item && $orderItem->item->supplier)
+            ->groupBy('item.supplier.id')
+            ->mapWithKeys(function ($itemsForSupplier, $supplierId) {
+                $revenue = $itemsForSupplier->sum(fn($i) => (float) $i->price * (int) $i->quantity);
+                $profit = $itemsForSupplier->sum(fn($i) => ((float) $i->price - (float) ($i->supplier_price ?? 0)) * (int) $i->quantity);
 
-        // === Chart dinamis mengikuti period ===
+                return [
+                    $supplierId => [
+                        'revenue'    => $revenue,
+                        'profit'     => $profit,
+                        'items_sold' => $itemsForSupplier->sum('quantity'),
+                    ]
+                ];
+            });
+
+        $allSuppliers = Supplier::get(['id', 'name']);
+        $supplierStats = $allSuppliers
+            ->map(function ($supplier) use ($salesBySupplier) {
+                $salesData = $salesBySupplier->get($supplier->id);
+
+                return [
+                    'id'       => $supplier->id,
+                    'name'     => $supplier->name,
+                    'revenue'  => $salesData['revenue'] ?? 0,
+                    'profit'   => $salesData['profit'] ?? 0,
+                    'items_sold' => $salesData['items_sold'] ?? 0,
+                ];
+            })
+            ->sortByDesc('revenue')
+            ->values();
         $chartLabels = [];
         $chartSeries = [];
 
         if ($start && $end) {
             if ($bucket === 'hour') {
-                // per jam (00-23)
                 $rows = Order::selectRaw('HOUR(created_at) as h, COUNT(*) as c')
                     ->whereBetween('created_at', [$start, $end])
                     ->groupBy('h')
@@ -156,11 +175,10 @@ class DashboardController extends Controller
                     $chartSeries[] = (int) ($rows[$h] ?? 0);
                 }
             } else {
-                // per hari pada rentang
                 $rows = Order::selectRaw('DATE(created_at) as d, COUNT(*) as c')
                     ->whereBetween('created_at', [$start, $end])
                     ->groupBy('d')
-                    ->pluck('c', 'd'); // key: 'Y-m-d'
+                    ->pluck('c', 'd');
 
                 $periodDays = CarbonPeriod::create($start->copy()->startOfDay(), $end->copy()->startOfDay());
                 foreach ($periodDays as $d) {
@@ -170,7 +188,6 @@ class DashboardController extends Controller
                 }
             }
         } else {
-            // fallback: setahun per bulan (jika belum pilih period)
             $rows = Order::selectRaw('MONTH(created_at) as m, COUNT(*) as c')
                 ->whereYear('created_at', now()->year)
                 ->groupBy('m')
@@ -187,21 +204,21 @@ class DashboardController extends Controller
             'orders'  => $orders,
             'filters' => $request->only(['period', 'start', 'end']),
             'stats'   => [
-                'items'    => $activeItemCount, // global
-                'supplier' => $supplierCount,   // global
-                'customer' => $customerCount,   // global
-                'orders'   => $ordersInPeriod,  // SUDAH ikut period
-                'income'   => $income,          // SUDAH ikut period
-                'profit'   => $profit,          // SUDAH ikut period + aman dari NaN
+                'items'    => $activeItemCount,
+                'supplier' => $supplierCount,
+                'customer' => $customerCount,
+                'orders'   => $ordersInPeriod,
+                'income'   => $income,
+                'profit'   => $profit,
             ],
             'chart' => [
                 'labels' => $chartLabels,
-                'series' => $chartSeries, // counts per label
-                'bucket' => $bucket,      // 'hour' | 'day' | 'month' (opsional untuk frontend)
+                'series' => $chartSeries,
+                'bucket' => $bucket,
             ],
+            'supplierStats' => $supplierStats,
         ]);
     }
-
     public function render_category(Request $request)
     {
         $search = $request->input('search');

@@ -25,9 +25,14 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'whatsapp_number' => fake()->unique()->phoneNumber(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'tanggal_lahir' => fake()->date(),
+            'jenis_kelamin' => fake()->boolean(),
+            'role' => 'customer', // Default role
+            'created_at' => fake()->dateTimeBetween('-1 year', 'now'),
             'remember_token' => Str::random(10),
         ];
     }
@@ -37,8 +42,32 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    /**
+     * State for an admin user.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn(array $attributes) => ['role' => 'admin']);
+    }
+
+    /**
+     * State for a staff user.
+     */
+    public function staff(): static
+    {
+        return $this->state(fn(array $attributes) => ['role' => 'staff']);
+    }
+
+    /**
+     * State for a kasir (cashier) user.
+     */
+    public function kasir(): static
+    {
+        return $this->state(fn(array $attributes) => ['role' => 'kasir']);
     }
 }

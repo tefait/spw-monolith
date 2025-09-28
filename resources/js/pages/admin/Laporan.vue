@@ -39,6 +39,7 @@ const filteredOrders = computed(() => {
     return fields.includes(term);
   });
 });
+const supplierStats = computed(() => page.props?.supplierStats || []);
 
 /** Format helpers */
 const fmtIDR = (n) => {
@@ -213,9 +214,40 @@ const filterReport = () => {
           </div>
           <main class="mt-2 md:mt-5">
             <h2 class="text-lg font-semibold text-textDark mb-4">Laporan lain</h2>
+            <div class="flex flex-col space-y-4 mt-4">
+              <h3 class="font-semibold text-textDark">Laporan per Supplier</h3>
+              <div class="max-w-full overflow-x-auto rounded-lg border border-textGray">
+                <table class="min-w-full text-sm">
+                  <thead class="bg-bgGray text-textDark">
+                    <tr>
+                      <th class="px-3 py-3 font-semibold border border-gray-200 text-left">No</th>
+                      <th class="px-3 py-3 font-semibold border border-gray-200 text-left">Nama Supplier</th>
+                      <th class="px-3 py-3 font-semibold border border-gray-200 text-left">Pendapatan (Omset)</th>
+                      <th class="px-3 py-3 font-semibold border border-gray-200 text-left">Keuntungan</th>
+                      <th class="px-3 py-3 font-semibold border border-gray-200 text-center">Item Terjual</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="supplierStats.length === 0" class="hover:bg-bgGray">
+                      <td colspan="5" class="px-3 py-6 text-center text-textGrayDark">
+                        Tidak ada data supplier untuk periode yang dipilih.
+                      </td>
+                    </tr>
+                    <tr v-for="(supplier, index) in supplierStats" :key="supplier.id" class="hover:bg-bgGray">
+                      <td class="px-3 py-2 border border-gray-200 align-top">{{ index + 1 }}</td>
+                      <td class="px-3 py-2 border border-gray-200 align-top font-medium">{{ supplier.name }}</td>
+                      <td class="px-3 py-2 border border-gray-200 align-top">{{ fmtIDR(supplier.revenue) }}</td>
+                      <td class="px-3 py-2 border border-gray-200 align-top">{{ fmtIDR(supplier.profit) }}</td>
+                      <td class="px-3 py-2 border border-gray-200 align-top text-center">{{ supplier.items_sold }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
 
             <!-- Cards row 1 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
               <div
                 class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
                 <div class="space-y-2">
