@@ -314,8 +314,13 @@ class OrderController extends Controller
             );
 
             // Delete old proof if it exists
-            if ($payment->proof) {
-                Storage::disk('public')->delete($payment->proof);
+            if ($payment->proof && Storage::disk('public')->exists($payment->proof)) {
+                try {
+                    Storage::disk('public')->delete($payment->proof);
+                } catch (\Exception $e) {
+                    // Log the error or handle it as needed
+                    // logger()->error("Failed to delete old proof: " . $e->getMessage());
+                }
             }
 
             // Store the new proof and update the record
