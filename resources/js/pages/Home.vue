@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
 import { usePage, router } from '@inertiajs/vue3';
 import BottomOffcanvas from '@/components/BottomOffcanvas.vue';
 import BottomNavbar from '@/components/BottomNavbar.vue';
@@ -29,7 +29,24 @@ const blockBackButton = () => {
 const changeCategory = (id) => {
   router.get('/', { category: id }, { preserveState: false, replace: true });
 };
+const categoryName = computed(() => {
+  if (!selectedCategory.value) return '';
+  const cat = props.categories?.find(c => c.id == selectedCategory.value);
+  return cat ? cat.name : '';
+});
 
+const headingText = computed(() => {
+  if (!displayedSearch.value && !selectedCategory.value) {
+    return 'Semua Menu';
+  }
+  if (!displayedSearch.value && selectedCategory.value) {
+    return `Menu untuk kategori ${categoryName.value}`;
+  }
+  if (displayedSearch.value && !selectedCategory.value) {
+    return `Hasil pencarian untuk "${displayedSearch.value}"`;
+  }
+  return `Hasil pencarian untuk "${displayedSearch.value}" di kategori ${categoryName.value}`;
+});
 
 // Hooks
 watch(search, (value) => {
@@ -39,6 +56,7 @@ watch(search, (value) => {
     displayedSearch.value = value;
   }, 500);
 });
+
 
 onMounted(() => {
   if (url === '/') {
@@ -155,7 +173,8 @@ onUnmounted(() => {
               'bg-primary': selectedCategory == category.id,
               'bg-white': selectedCategory != category.id
             }">
-            <img class="h-10 w-10" :src="category.image">
+            <img class="h-10 w-10" @error="$event.target.src = '/assets/images/categoryFallback.svg'"
+              :src="category?.image" />
             <p class="text-textDark text-xs text-center">{{ category.name }}</p>
           </button>
         </div>
@@ -166,9 +185,7 @@ onUnmounted(() => {
       <!-- Product List -->
       <h1 class="text-textDark text-lg font-bold">
         {{
-          !displayedSearch
-            ? 'Semua Menu'
-            : `Hasil pencarian untuk \"${displayedSearch}\"`
+headingText
         }}
       </h1>
 

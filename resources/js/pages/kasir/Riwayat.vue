@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
       <div>
         <div class="md:flex justify-between items-center">
           <h1 class="text-textDark text-lg font-semibold">Riwayat Pesanan</h1>
-          <div class="mt-4 md:mt-0">
+          <!-- <div class="mt-4 md:mt-0">
             <div class="w-full md:w-96 relative">
               <input type="search" class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
                 placeholder="Cari pesanan" />
@@ -191,7 +191,7 @@ onBeforeUnmount(() => {
                 </p>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 min-h-fit">
           <button v-for="order in $page.props.orders" @click="openModalDetail(order)"

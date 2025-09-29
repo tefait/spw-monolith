@@ -168,33 +168,23 @@ const closeModalHapus = () => {
     <HeaderDashboard />
 
     <section class="mt-4 w-full">
-      <div class="md:flex justify-between">
-        <div class="">
-          <div class="w-full md:w-96 relative">
-            <input type="search" class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-              placeholder="Cari pengguna" />
-            <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
-              <p class="text-textDark text-xl">
-                <i class="fi fi-rr-search"></i>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="mt-4 md:mt-0">
-          <button @click="openModalTambah"
-            class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300">
-            <p class="text-textDark text-sm translate-y-0.5">
-              <i class="fi fi-rr-plus"></i>
-            </p>
-            <p class="text-textDark font-medium">Tambah Pengguna</p>
-          </button>
-        </div>
-      </div>
+
     </section>
 
     <section class="mt-6">
       <div>
-        <h1 class="text-textDark text-lg font-semibold">Daftar Pengguna</h1>
+        <div class="md:flex justify-between items-center">
+          <h1 class="text-textDark text-lg font-semibold">Data Pengguna</h1>
+          <div class="mt-4 md:mt-0">
+            <button @click="openModalTambah"
+              class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300">
+              <p class="text-textDark text-sm translate-y-0.5">
+                <i class="fi fi-rr-plus"></i>
+              </p>
+              <p class="text-textDark font-medium">Tambah Pengguna</p>
+            </button>
+          </div>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
           <div v-for="userL in $page.props.users" :key="userL.id" @click="openModalDetail(userL)"
             class="relative col-span-1 bg-white p-6 mt-4 rounded-3xl flex items-center gap-4 text-start cursor-pointer">

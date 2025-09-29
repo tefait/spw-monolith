@@ -6,7 +6,6 @@ import { router, useForm, usePage } from '@inertiajs/vue3';
 import HeaderDashboard from '@/components/HeaderDashboard.vue';
 import { push } from 'notivue';
 
-
 const fileName = ref('');
 const page = usePage();
 // Dropdown Profil
@@ -14,10 +13,11 @@ const product = ref({});
 const isDropdownOpen = ref(false);
 const newProduct = useForm({
   name: '',
+  description: '', // Added description
   supplier_price: 0,
   price: 0,
   stock: 0,
-  category_id: 0, // change this to the correct category id later
+  category_id: 0,
   image: null,
   supplier_id: 'placeholder',
   status: 'placeholder',
@@ -29,7 +29,6 @@ const saveNewProduct = () => {
       newProduct.reset();
       closeModalTambah();
       fileName.value = '';
-
       push.success(page.props.flash.success);
     },
   });
@@ -38,7 +37,8 @@ const saveNewProduct = () => {
 const editProductForm = useForm({
   _method: 'PUT',
   name: null,
-  category_id: 0, // change this to the correct category id later
+  description: '', // Added description
+  category_id: 0,
   supplier_price: null,
   price: null,
   stock: null,
@@ -54,7 +54,6 @@ const submitEdit = () =>
       editProductForm.reset();
       closeModalUbah();
       fileName.value = '';
-
       router.visit('/admin/menu');
       push.success(page.props.flash.success);
     },
@@ -62,6 +61,7 @@ const submitEdit = () =>
       console.error('Cannot edit menu sorry:(', error);
     },
   });
+
 const dropdownRef = ref(null);
 const updateFileName = (event) => {
   editProductForm.image = event.target.files[0];
@@ -138,6 +138,7 @@ const closeModalTambah = () => {
 const showModalUbah = ref(false);
 const openModalUbah = () => {
   editProductForm.name = product.value?.name;
+  editProductForm.description = product.value?.description; // Added description
   editProductForm.price = product.value?.price;
   editProductForm.stock = product.value?.stock;
   editProductForm.supplier_id = product.value?.supplier_id;
@@ -166,7 +167,7 @@ const closeModalHapus = () => {
     <HeaderDashboard />
 
     <section class="mt-4 w-full">
-      <div class="md:flex justify-between">
+      <!-- <div class="md:flex justify-between">
         <div class="">
           <div class="w-full md:w-96 relative">
             <input type="search" class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
@@ -192,14 +193,25 @@ const closeModalHapus = () => {
             <p class="text-textDark font-medium">Tambah Menu</p>
           </button>
         </div>
-      </div>
+      </div> -->
     </section>
 
     <section class="mt-6">
       <div>
-        <h1 class="text-textDark text-lg font-semibold">
-          Daftar Menu Hari Ini
-        </h1>
+        <div class="md:flex justify-between">
+          <h1 class="text-textDark text-lg font-semibold">
+            Data Menu
+          </h1>
+          <div class="flex gap-2 mt-4 md:mt-0">
+            <button @click="openModalTambah"
+              class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300">
+              <p class="text-textDark text-sm translate-y-0.5">
+                <i class="fi fi-rr-plus"></i>
+              </p>
+              <p class="text-textDark font-medium">Tambah Menu</p>
+            </button>
+          </div>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-4">
           <div v-for="item in $page.props.items" :key="item.id" @click="openModalDetail(item)" type="button"
             class="col-span-1 p-4 mt-4 rounded-3xl flex gap-4 text-start cursor-pointer"
@@ -210,12 +222,16 @@ const closeModalHapus = () => {
             <div class="my-auto">
               <h1 class="line-clamp-1 flex justify-between">
                 <div class="">{{ item.name }}</div>
-                <div class="ms-1 md:ms-2 text-xs bg-green-600/25 flex justify-center items-center text-center line-clamp-1 rounded-full px-2 py-1">{{ item.category.name }}</div>
+                <div
+                  class="ms-1 md:ms-2 text-xs bg-green-600/25 flex justify-center items-center text-center line-clamp-1 rounded-full px-2 py-1">
+                  {{ item.category.name }}</div>
               </h1>
               <h2 class="font-bold">
                 Rp{{ Number(item.price).toLocaleString('id-ID') }}
               </h2>
               <p class="text-xs text-textDark mt-1">Stok: {{ item.stock }}</p>
+              <!-- Show description in card if needed -->
+              <!-- <p class="text-xs text-textGrayDark mt-1">{{ item.description }}</p> -->
             </div>
             <div class="flex items-center ml-auto my-auto">
               <p class="text-textDark">
@@ -249,6 +265,10 @@ const closeModalHapus = () => {
           </div>
           <div class="w-[56%] text-start mt-4 md:mt-0">
             <h1 class="line-clamp-1">{{ product?.name }}</h1>
+            <div class="mt-2">
+              <p class="text-textGrayDark text-xs">Deskripsi</p>
+              <h2 class="text-textDark">{{ product?.description }}</h2>
+            </div>
             <div class="mt-2">
               <p class="text-textGrayDark text-xs">Harga</p>
               <h2 class="text-textDark font-bold">
@@ -354,6 +374,16 @@ const closeModalHapus = () => {
                     <i class="fi fi-rr-hamburger-soda"></i>
                   </p>
                 </div>
+              </div>
+            </div>
+
+            <!-- Deskripsi Menu -->
+            <div class="col-span-1 md:col-span-2">
+              <label for="deskripsi-menu" class="text-textDark">Deskripsi Menu</label>
+              <div class="relative mt-2">
+                <textarea id="deskripsi-menu" v-model="newProduct.description"
+                  class="peer py-3 px-4 block w-full bg-white rounded-2xl border-none focus:outline-none"
+                  placeholder="Masukkan Deskripsi Menu" rows="2"></textarea>
               </div>
             </div>
 
@@ -521,6 +551,16 @@ const closeModalHapus = () => {
                     <i class="fi fi-rr-hamburger-soda"></i>
                   </p>
                 </div>
+              </div>
+            </div>
+
+            <!-- Deskripsi Menu -->
+            <div class="col-span-1 md:col-span-2">
+              <label for="deskripsi-menu-edit" class="text-textDark">Deskripsi Menu</label>
+              <div class="relative mt-2">
+                <textarea id="deskripsi-menu-edit" v-model="editProductForm.description"
+                  class="peer py-3 px-4 block w-full bg-white rounded-2xl border-none focus:outline-none"
+                  placeholder="Masukkan Deskripsi Menu" rows="2"></textarea>
               </div>
             </div>
 

@@ -148,7 +148,7 @@ const deleteSupplier = () => {
 
     <section class="mt-6">
       <div>
-        <h1 class="text-textDark text-lg font-semibold">Daftar Supplier</h1>
+        <h1 class="text-textDark text-lg font-semibold">Data Supplier</h1>
         <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-4">
           <div v-for="supplier in $page.props.suppliers" @click="openModalDetail(supplier)"
             class="col-span-1 bg-white p-6 mt-4 rounded-3xl flex items-center gap-4 text-start cursor-pointer">

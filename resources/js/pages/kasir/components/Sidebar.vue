@@ -48,7 +48,7 @@ const route = { path: page.url };
         <p class="text-sm">Riwayat</p>
       </Link>
 
-      <Link
+      <!-- <Link
         href="/kasir/pengaturan"
         :class="
           route.path === '/kasir/pengaturan'
@@ -59,7 +59,7 @@ const route = { path: page.url };
       >
         <p class="text-3xl"><i class="fi fi-sr-settings"></i></p>
         <p class="text-sm">Pengaturan</p>
-      </Link>
+      </Link> -->
     </div>
   </nav>
 

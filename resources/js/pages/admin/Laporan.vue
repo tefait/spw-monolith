@@ -76,7 +76,7 @@ const filterReport = () => {
     <HeaderDashboard />
 
     <!-- Top bar -->
-    <section class="mt-4 w-full">
+    <!-- <section class="mt-4 w-full">
       <div class="md:flex justify-between">
         <div class="w-full md:w-96 relative">
           <input v-model="q" type="search"
@@ -87,12 +87,12 @@ const filterReport = () => {
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Content -->
     <section class="mt-6">
       <div>
-        <h1 class="text-textDark text-xl font-bold">Laporan</h1>
+        <h1 class="text-textDark text-xl font-bold">Laporan/Reports</h1>
 
         <div class="w-full p-6 mt-4 bg-white rounded-2xl shadow-sm">
           <!-- Filters -->
@@ -214,6 +214,7 @@ const filterReport = () => {
           </div>
           <main class="mt-2 md:mt-5">
             <h2 class="text-lg font-semibold text-textDark mb-4">Laporan lain</h2>
+            <hr class="text-gray-300 p-0 m-0">
             <div class="flex flex-col space-y-4 mt-4">
               <h3 class="font-semibold text-textDark">Laporan per Supplier</h3>
               <div class="max-w-full overflow-x-auto rounded-lg border border-textGray">
@@ -247,7 +248,8 @@ const filterReport = () => {
 
 
             <!-- Cards row 1 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <h3 class="font-semibold text-textDark mt-6 mb-2">Statistik berdasarkan Periode</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div
                 class="h-fit bg-primaryThin p-4 rounded-2xl flex justify-between group items-center hover:bg-primary">
                 <div class="space-y-2">

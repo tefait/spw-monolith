@@ -289,7 +289,7 @@ watch(checkoutForm, (value) => {
 
     <section class="mt-4 md:me-[30vw]">
       <div class="md:flex justify-between">
-        <div class="">
+        <!-- <div class="">
           <div class="w-full md:w-96 relative">
             <input type="search" class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
               placeholder="Cari menu" />
@@ -299,7 +299,7 @@ watch(checkoutForm, (value) => {
               </p>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- <div class="mt-4 md:mt-0">
           <button
             class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300">
@@ -317,7 +317,7 @@ watch(checkoutForm, (value) => {
     <section class="mt-6 md:me-[30vw]">
       <div>
         <h1 class="text-textDark text-lg font-semibold">
-          Daftar Menu Hari Ini
+          Daftar Menu
         </h1>
         <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-4">
           <button v-for="item in menus" :key="item.id" @click="addTocart(item)" type="button"

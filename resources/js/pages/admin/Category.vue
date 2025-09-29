@@ -163,19 +163,15 @@ const closeModalKeluar = () => {
     <HeaderDashboard @openModalKeluar="openModalKeluar" />
 
     <section class="mt-4 w-full">
-      <div class="md:flex justify-between">
-        <div class="">
-          <div class="w-full md:w-96 relative">
-            <input type="search" class="peer py-3 px-4 ps-12 block w-full bg-white rounded-full focus:outline-none"
-              placeholder="Cari kategori" />
-            <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 pt-1">
-              <p class="text-textDark text-xl">
-                <i class="fi fi-rr-search"></i>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="flex gap-2 mt-4 md:mt-0">
+
+    </section>
+
+    <section class="mt-6">
+      <div>
+        <div class="flex gap-2 mt-4 md:mt-0 justify-between items-center">
+          <h1 class="text-textDark text-lg font-semibold">
+            Data Kategori
+          </h1>
           <button @click="openModalTambah"
             class="bg-primary py-3 md:px-8 w-full md:w-auto rounded-full flex justify-center items-center gap-2 cursor-pointer hover:brightness-90 duration-300">
             <p class="text-sm translate-y-0.5">
@@ -184,21 +180,16 @@ const closeModalKeluar = () => {
             <p class="font-medium">Tambah Kategori</p>
           </button>
         </div>
-      </div>
-    </section>
 
-    <section class="mt-6">
-      <div>
-        <h1 class="text-textDark text-lg font-semibold">
-          Daftar Kategori
-        </h1>
         <div class="grid grid-cols-1 md:grid-cols-3 md:gap-x-4">
           <div v-for="item in $page.props.categories" :key="item.id" @click="openModalDetail(item)" type="button"
             class="col-span-1 p-4 mt-4 rounded-3xl flex gap-4 text-start cursor-pointer"
             :class="item.status ? 'bg-primaryThin' : 'bg-white'">
-            <div class="w-[calc(50%-56px)] h-[12vh] sm:w-[8vw] rounded-2xl overflow-hidden relative">
-              <img :src="item.image" class="absolute top-0 left-0 w-full h-full object-cover" alt="" />
+            <div class="h-[12vh]">
+              <img :src="item.image" @error="$event.target.src = '/assets/images/categoryFallback.svg'"
+                class="w-full h-full aspect-square object-contain" />
             </div>
+
             <div class="my-auto">
               <h1 class="line-clamp-1">{{ item.name }}</h1>
               <h2 class="font-bold">
@@ -232,11 +223,11 @@ const closeModalKeluar = () => {
           </p>
         </div>
         <div class="md:flex gap-4 mt-4">
-          <div
-            class="relative w-36 h-36 md:w-[calc(50%-56px)] md:h-auto rounded-full md:rounded-3xl mx-auto overflow-hidden">
-            <img :src="category?.image" class="absolute top-0 left-0 w-full h-full object-cover" alt="" />
+          <div class="h-36 md:h-auto mx-auto">
+            <img :src="category?.image" @error="$event.target.src = '/assets/images/categoryFallback.svg'"
+              class="w-full h-full object-contain" alt="" />
           </div>
-          <div class="w-[56%] text-start mt-4 md:mt-0">
+          <div class="w-[56%] mt-10 text-start md:mt-0">
             <h1 class="line-clamp-1">{{ category?.name }}</h1>
             <div class="mt-2">
               <p class="text-textGrayDark text-xs">Jumlah produk</p>
