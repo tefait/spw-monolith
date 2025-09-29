@@ -12,11 +12,13 @@ class ItemController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
+            'description' => 'nullable|string',
             'supplier_id' => 'required|exists:suppliers,id',
+            'supplier_price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|gt:supplier_price',
+            'status' => 'required|boolean',
             'image' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:2048',
         ]);
         $data = $request->except('image');
@@ -48,12 +50,12 @@ class ItemController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
             'supplier_id' => 'required|exists:suppliers,id',
             'supplier_price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|gt:supplier_price',
             'status' => 'required|boolean',
             'image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
