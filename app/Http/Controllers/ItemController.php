@@ -17,7 +17,7 @@ class ItemController extends Controller
             'description' => 'nullable|string',
             'supplier_id' => 'required|exists:suppliers,id',
             'supplier_price' => 'required|numeric|min:0',
-            'price' => 'required|numeric|min:0|gt:supplier_price',
+            'price' => 'required|numeric|min:0|gte:supplier_price',
             'status' => 'required|boolean',
             'image' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif|max:2048',
         ]);
@@ -55,7 +55,7 @@ class ItemController extends Controller
             'description' => 'nullable|string',
             'supplier_id' => 'required|exists:suppliers,id',
             'supplier_price' => 'required|numeric|min:0',
-            'price' => 'required|numeric|min:0|gt:supplier_price',
+            'price' => 'required|numeric|min:0|gte:supplier_price',
             'status' => 'required|boolean',
             'image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
