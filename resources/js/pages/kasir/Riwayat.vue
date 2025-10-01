@@ -138,7 +138,7 @@ const cetakStruk = async () => {
     await connectPrinter();
   }
   text.value =
-    "SPW Gridas\n\n\n\n" +
+    "SIPEKA\n\n\n\n" +
     `Tanggal   : ${(ORDER.value?.created_at && new Date(ORDER.value.created_at).toLocaleString('id-ID')) || '-'}\n` +
     // `Kasir     : ${ORDER.value?.cashier_name || 'N/A'}\n` +
     `Transaksi : ${ORDER.value?.transaction_code || '-'}\n` +

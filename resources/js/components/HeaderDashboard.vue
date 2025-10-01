@@ -28,7 +28,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="bg-white p-4 rounded-2xl flex justify-between items-center">
     <div>
-      <h1 class="text-lg font-semibold">SPW Gridas</h1>
+      <h1 class="text-lg font-semibold">SIPEKA</h1>
     </div>
     <!-- Dropdown -->
     <div class="relative" ref="dropdownRef">

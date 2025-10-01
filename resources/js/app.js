@@ -9,7 +9,7 @@ import UserLayout from './layouts/UserLayout.vue';
 import 'notivue/notification.css';
 import 'notivue/animations.css';
 import { createNotivue } from 'notivue';
-const appName = import.meta.env.VITE_APP_NAME || 'SPW Gridas';
+const appName = import.meta.env.VITE_APP_NAME || 'SIPEKA';
 
 const notivue = createNotivue({
   position: 'top-center',

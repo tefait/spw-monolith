@@ -16,28 +16,33 @@ class HomeController extends Controller
         $search = $request->input('search');
         $category = $request->input('category');
 
-        $itemsQuery = Item::query()->where('stock', '>=', 1)->where('status', true);
+        $items = Item::with('category')
+            ->where('stock', '>=', 1)
+            ->where('status', true)
+            ->when(
+                $search,
+                fn($q) =>
+                $q->where('name', 'like', '%' . $search . '%')
+            )
+            ->when(
+                $category,
+                fn($q) =>
+                $q->where('category_id', $category)
+            )
+            ->orderBy(Category::select('created_at')
+                ->whereColumn('categories.id', 'items.category_id')) // subquery sort
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        if ($search) {
-            $itemsQuery->where('name', 'like', '%' . $search . '%');
-        }
-
-        if ($category) {
-            $itemsQuery->where('category_id', $category);
-        }
-
-        $items = $itemsQuery->latest()->get();
-        $categories = Category::latest()->get();
+        $categories = Category::oldest()->get();
 
         return Inertia::render('Home', [
             'items' => $items,
             'categories' => $categories,
-            'filters' => [
-                'search' => $search,
-                'category' => $category,
-            ],
+            'filters' => compact('search', 'category'),
         ]);
     }
+
 
     public function searchItems(Request $request): JsonResponse
     {

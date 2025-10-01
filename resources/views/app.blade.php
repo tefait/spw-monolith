@@ -10,7 +10,7 @@
     <link href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-chubby/css/uicons-solid-chubby.css" rel="stylesheet">
     <link href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css" rel="stylesheet">
     <link href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-straight/css/uicons-solid-straight.css" rel="stylesheet">
-    <title inertia>{{ config('app.name', 'SPW Gridas') }}</title>
+    <title inertia>{{ config('app.name', 'SIPEKA') }}</title>
 
     {{-- @routes --}}
     @vite(['resources/js/app.js'])

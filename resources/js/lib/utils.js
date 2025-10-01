@@ -51,7 +51,7 @@ export const printWithDocumentPrint = (ORDER, push) => {
         </style>
       </head>
       <body onload="window.print(); window.close();">
-        <div class="center bold">SPW Gridas</div>
+        <div class="center bold">SIPEKA</div>
 
         <br>
         Tanggal     : ${ORDER.created_at || '-'}

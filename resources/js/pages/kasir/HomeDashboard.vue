@@ -224,7 +224,7 @@ const cetakStruk = async () => {
     await connectPrinter();
   }
   text.value =
-    "SPW Gridas\n\n\n\n" +
+    "SIPEKA\n\n\n\n" +
     `Tanggal   : ${(page.props.flash.success.order?.created_at && new Date(page.props.flash.success.order.created_at).toLocaleString('id-ID')) || '-'}\n` +
     // `Kasir     : ${page.props.flash.success.order?.cashier_name || 'N/A'}\n` +
     `Transaksi : ${page.props.flash.success.order?.transaction_code || '-'}\n` +
@@ -319,7 +319,7 @@ watch(checkoutForm, (value) => {
         <h1 class="text-textDark text-lg font-semibold">
           Daftar Menu
         </h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-2 lg:gap-x-2">
           <button v-for="item in menus" :key="item.id" @click="addTocart(item)" type="button"
             class="col-span-1 bg-primaryThin p-4 mt-4 rounded-3xl flex gap-4 text-start cursor-pointer">
             <div class="w-[calc(50%-56px)] h-[12vh] sm:w-[8vw] rounded-2xl overflow-hidden relative">
