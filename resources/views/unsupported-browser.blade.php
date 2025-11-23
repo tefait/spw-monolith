@@ -111,29 +111,29 @@
     <h1>Browser Tidak Didukung</h1>
     <p>Untuk pengalaman terbaik, silakan gunakan salah satu browser berikut:</p>
     <ul class="browser-list">
-        <li>
+        <li onclick="openIn('chrome')">
             <img src="https://www.google.com/chrome/static/images/favicons/favicon-96x96.png" alt="Chrome">
             Chrome
         </li>
-        <li>
+        <li onclick="openIn('firefox')">
             <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Firefox_logo%2C_2019.svg" alt="Firefox">
             Firefox
         </li>
-        <li>
+        <li onclick="openIn('edge')">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Microsoft_Edge_logo_%282019%29.svg/96px-Microsoft_Edge_logo_%282019%29.svg.png" alt="Edge">
             Edge
         </li>
     </ul>
 
     <div class="actions">
-        <button onclick="openIn('chrome')">Buka di chrome</button>
-        <button onclick="openIn('firefox')">Buka di firefox</button>
-        <button onclick="openIn('edge')">Buka di edge</button>
+        <button onclick="openIn('chrome')">Buka di Chrome</button>
+        <button onclick="openIn('firefox')">Buka di Firefox</button>
+        <button onclick="openIn('edge')">Buka di Edge</button>
     </div>
 
     <script>
         function openIn(browser) {
-            const currentUrl = window.location.href.replace(/^https?:\/\//, '');
+            const currentUrl = window.location.host.replace(/^https?:\/\//, '');
             let intentUrl = '';
 
             switch (browser) {
@@ -147,7 +147,6 @@
                     intentUrl = `intent://${currentUrl}#Intent;scheme=https;package=com.microsoft.emmx;end;`;
                     break;
                 default:
-                    // General chooser (biar user pilih browser)
                     intentUrl = `intent://${currentUrl}#Intent;scheme=https;end;`;
                     break;
             }
