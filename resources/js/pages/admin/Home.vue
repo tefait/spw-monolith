@@ -1,6 +1,6 @@
 <template>
   <div class="bg-bgGray min-h-screen md:ps-[150px] p-4 md:pe-4 pt-[18px] pb-24 md:pb-0">
-    <HeaderDashboard/>
+    <HeaderDashboard />
 
     <section class="bg-white mt-4 p-4 rounded-2xl">
       <div>
@@ -97,6 +97,20 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="w-full h-screen mt-4">
+        <h1 class="text-textDark text-lg font-semibold">Feedback Platform</h1>
+        <p class="text-textDark text-sm font-light">Saat ini fitur kelola Feedback platform masih dalam tahap integrasi.
+          Untuk melihat response dari survei, silakan klik
+          <a href="https://docs.google.com/forms/d/1qF3vSQtCYHSJz0DJjyS2PxSVdaORIan4laQF2WQmpOM/edit" class="bg-gray-100 text-blue-500 p-1 font-medium rounded-md">
+            Buka dokumen secara langsung (Open the document Directly)
+          </a>
+          .
+        </p>
+        <iframe src="https://docs.google.com/forms/d/1qF3vSQtCYHSJz0DJjyS2PxSVdaORIan4laQF2WQmpOM/edit?embedded=true"  class="w-full h-full" frameborder="0" allowfullscreen="true" allowtransparency=""
+          loading="lazy">
+          Loading...
+        </iframe>
       </div>
     </section>
   </div>
