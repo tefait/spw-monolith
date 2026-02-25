@@ -29,8 +29,9 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        if (Storage::disk('public')->exists($category->getRawOriginal('image'))) {
-            Storage::disk('public')->delete($category->getRawOriginal('image'));
+        $imagePath = $category->getRawOriginal('image');
+        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
         }
         return redirect()->back()->with('success', 'Noice! Kategori berhasil dihapus!');
     }
